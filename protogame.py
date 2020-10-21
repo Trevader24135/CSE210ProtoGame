@@ -121,8 +121,10 @@ def mainLaunch(renderer = ''):
         import RayCasterNoTextures as RayCaster
     elif renderer == 'MANUALTEXTURES':
         import RayCasterManualTextures as RayCaster
+    elif renderer == 'GFX':
+        import RayCasterGFX as RayCaster
     else:
-        import RayCaster
+        import RayCasterNoTextures as RayCaster
     controller = Game()
     controller.on_execute()
 
