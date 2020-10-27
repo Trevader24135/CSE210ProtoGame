@@ -101,10 +101,10 @@ class Screen:
                 except:
                     rectHeightTwo = (self.height / 4)/(rays[i][0] * flatness)
 
-                corners = [[iOne * self.supersampling, self.height/2 + rectHeightOne],
-                    [(i+1) * self.supersampling, self.height/2 + rectHeightTwo],
-                    [(i+1) * self.supersampling, self.height/2 - rectHeightTwo],
-                    [iOne * self.supersampling, self.height/2 - rectHeightOne]]
+                corners = [[iOne * self.supersampling, int(self.height/2 + rectHeightOne)],
+                    [(i+1) * self.supersampling, int(self.height/2 + rectHeightTwo)],
+                    [(i+1) * self.supersampling, int(self.height/2 - rectHeightTwo)],
+                    [iOne * self.supersampling, int(self.height/2 - rectHeightOne)]]
                 
                 polygons.append([(rays[iOne][1] + rays[i][1])/2, corners, (rays[i][3][0],rays[i][3][1]), rays[i][4]])
             except:

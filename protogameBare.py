@@ -106,12 +106,11 @@ class Game:
         self._running = True
         self.size = self.width, self.height = width, height
         self.keysHeld = []
-        self.screen = pygame.display.set_mode(self.size)# | pygame.FULLSCREEN
+        self.screen = pygame.display.set_mode(self.size)
         self.screen.set_alpha(None)
         self.rayCaster = RayCaster.Screen(map, width = width, height = height, supersampling = supersampling, cameraDist = cameraDist, debug = False)
-        self.loopTime = 0
+        self.loopTime, self.fpsTime = 0, 0
         self.player = Player()
-        self.timerFrame, self.timerAverage = 0, 0
 
         self.enemies = []
         self.enemies.append(Goblin())
@@ -144,7 +143,7 @@ class Game:
 
     def on_render(self):
         self.screen.fill((0,0,0))
-        self.screen.fill((92,92,92), (0,height/2, width, height/2))
+        self.screen.fill((92,92,92), (0,int(height/2), width, int(height/2)))
 
         rays = self.rayCaster.RaySweep(self.player.position,self.player.direction)
         polygons = self.rayCaster.RenderSweep(rays)
@@ -163,12 +162,10 @@ class Game:
     def timer(self):
         self.deltaTime = time.perf_counter() - self.loopTime
         self.loopTime = time.perf_counter()
-        if self.timerFrame >= 60:
-            print(round((self.timerAverage / 60) * 1000, 2), " ms")
-            self.timerFrame, self.timerAverage = 0, 0
-        else:
-            self.timerAverage += self.deltaTime
-        self.timerFrame += 1
+        self.fpsTime += self.loopTime
+        if self.fpsTime > 100:
+            print("FPS:", round(1/self.deltaTime,1))
+            self.fpsTime = 0
 
     def on_execute(self):
         while( self._running ):
