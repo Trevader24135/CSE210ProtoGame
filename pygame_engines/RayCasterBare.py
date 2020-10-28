@@ -92,7 +92,7 @@ class Screen:
         while i < len(rays):
             try:
                 iOne = i
-                rectHeightOne = (self.height / 4)/(rays[iOne][0] * flatness)
+                rectHeightOne = (self.height / 4)/(rays[iOne][0])
                 try:
                     while rays[i][4] == rays[i + 1][4] and -0.25 < rays[i][0] - rays[i+1][0] < 0.25 and rays[i][3] == rays[i + 1][3]:
                         i += 1
