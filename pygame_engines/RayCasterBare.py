@@ -2,8 +2,6 @@ import math
 
 import VectorOps
 
-flatness = 1.2
-
 def lerp(endpoints, steps):
     interpolated = [endpoints[0]]
     delta = (endpoints[1] - endpoints[0]) / (steps - 1)
@@ -17,9 +15,17 @@ def fpart(number):
 def fparta(number):
     return [i - int(i) for i in number]
 
+def sortbyindex(List, index):
+    sorter = [j for j,i in enumerate(List)]
+    sorter.sort(key = [i[index] for i in List].__getitem__)
+    temp = List[:]
+    for i, j in enumerate(sorter):
+        List[i] = temp[j]
+    return List
+
 class Screen:
     class Ray:
-        def __init__(self, position, direction, angle):
+        def __init__(self, position, direction, angle): #origin of ray, forward direction of player (for non-euclidean distance), angle of ray
             self.directionOriginal = direction
             self.direction = VectorOps.normalize(VectorOps.rotate(direction,angle))
             self.position = position[:]
@@ -58,7 +64,7 @@ class Screen:
         def Cast(self):
             try:
                 ni = self.NextIntercept()
-                while map[ni[3][0]][ni[3][1]] == 0:
+                while map[ni[3][0]][ni[3][1]] <= 0:
                     ni = self.NextIntercept()
             except:
                 pass
@@ -80,7 +86,7 @@ class Screen:
             rays.append(self.Ray(position, i, VectorOps.angle(direction)).Cast())
         return rays
 
-    def RenderSweep(self, rays):
+    def RenderSweep(self, rays, sort = False):
         polygons = []
         i = 0
         while i < len(rays):
@@ -95,21 +101,23 @@ class Screen:
                 
                 try:
                     if -0.5 < rays[i][0] - rays[i+1][0] < 0.5:
-                        rectHeightTwo = (self.height / 4)/(rays[i+1][0] * flatness)
+                        rectHeightTwo = (self.height / 4)/(rays[i+1][0])
                     else:
-                        rectHeightTwo = (self.height / 4)/(rays[i][0] * flatness)
+                        rectHeightTwo = (self.height / 4)/(rays[i][0])
                 except:
-                    rectHeightTwo = (self.height / 4)/(rays[i][0] * flatness)
+                    rectHeightTwo = (self.height / 4)/(rays[i][0])
 
                 corners = [[iOne * self.supersampling, int(self.height/2 + rectHeightOne)],
                     [(i+1) * self.supersampling, int(self.height/2 + rectHeightTwo)],
                     [(i+1) * self.supersampling, int(self.height/2 - rectHeightTwo)],
                     [iOne * self.supersampling, int(self.height/2 - rectHeightOne)]]
                 
-                polygons.append([(rays[iOne][1] + rays[i][1])/2, corners, (rays[i][3][0],rays[i][3][1]), rays[i][4]])
+                polygons.append([(rays[iOne][1] if (rays[iOne][1] > rays[i][1]) else rays[i][1]), corners, (rays[i][3][0],rays[i][3][1]), rays[i][4]])
             except:
                 pass
             i += 1
+        if sort:
+            polygons = sortbyindex(polygons, 0)
         return polygons
 
     def TestLoS(self, positionOne, positionTwo):

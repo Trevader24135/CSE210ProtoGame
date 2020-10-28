@@ -11,11 +11,14 @@ import VectorOps
 #goblin = io.imread("assets\\goblin.png")
 goblin = pygame.image.load("assets\\goblin.png")
 
-cameraDist = 0.08
+FOV = 100
 width = 800
 height = 600
 supersampling = 3
 
+
+FOV *= math.pi / 180
+cameraDist = 0.1 / math.tan(FOV / 2)
 def genMap():
     def tile(colors):
         colors = [str(n) for n in colors]
@@ -24,20 +27,20 @@ def genMap():
         return colors
     #[[Scolor],[Wcolor],[Ncolor],[Ecolor]]
     gw = tile([333,333,333,333])
-    rb = tile([700,70,7,777])
+    rb = tile([700,70,7,707])
 
     return [
         [gw, gw, gw, gw, gw, gw, gw],
         [gw, 0, gw, 0, 0, 0, gw], 
         [gw, 0, gw, 0, rb, 0, gw], 
         [gw, 0, 0, 0, 0, 0, gw], 
-        [gw, 0, 0, 0, 0, 0, gw], 
+        [rb, 0, 0, 0, 0, 0, gw], 
         [gw, gw, gw, 0, 0, gw, gw], 
         [gw, gw, gw, gw, 0, gw, gw], 
         [gw, 0, 0, 0, 0, 0, gw], 
         [gw, gw, gw, gw, 0, gw, gw], 
         [gw, 0, 0, 0, 0, 0, gw], 
-        [gw, 0, 0, 0, 0, 0, gw], 
+        [gw, 0, 0, 0, -1, 0, gw], 
         [gw, 0, 0, 0, 0, 0, gw], 
         [gw, gw, gw, gw, gw, gw, gw]]#""""
 map = genMap()
@@ -78,13 +81,14 @@ class Object:
             return map[int(self.position[0]) + direction[0]][int(self.position[1]) + direction[1]]
         
         def checkCollision(direction): #run 2 checks in each direction, at each side of the player
-            if direction[0] > 0 and mapRel((1,0)) != 0 and VectorOps.fpart(self.position[0]) > 1 - self.radius:
+            
+            if direction[0] > 0 and mapRel((1,0)) > 0 and VectorOps.fpart(self.position[0]) > 1 - self.radius:
                 direction[0] = 0
-            elif direction[0] < 0 and mapRel((-1,0)) != 0 and VectorOps.fpart(self.position[0]) < self.radius:
+            elif direction[0] < 0 and mapRel((-1,0)) > 0 and VectorOps.fpart(self.position[0]) < self.radius:
                 direction[0] = 0
-            if direction[1] > 0 and mapRel((0,1)) != 0 and VectorOps.fpart(self.position[1]) > 1 - self.radius:
+            if direction[1] > 0 and mapRel((0,1)) > 0 and VectorOps.fpart(self.position[1]) > 1 - self.radius:
                 direction[1] = 0
-            elif direction[1] < 0 and mapRel((0,-1)) != 0 and VectorOps.fpart(self.position[1]) < self.radius:
+            elif direction[1] < 0 and mapRel((0,-1)) > 0 and VectorOps.fpart(self.position[1]) < self.radius:
                 direction[1] = 0
             return direction
         
@@ -98,7 +102,7 @@ class Player(Object):
 
 class Goblin(Object):
     def __init__(self):
-        super().__init__(position = [4,3], sprite = goblin)
+        super().__init__(position = [3.1,3.1], sprite = goblin)
 
 class Game:
     def __init__(self):
@@ -142,20 +146,54 @@ class Game:
         playerMovement()
 
     def on_render(self):
-        self.screen.fill((0,0,0))
-        self.screen.fill((92,92,92), (0,int(height/2), width, int(height/2)))
+        def generateSpriteList():
+            sprites = []
+            for i in self.enemies:
+                spriteDist = VectorOps.distance(self.player.position, i.position)
+                sprites.append([i, spriteDist])
 
+            for i in sprites:
+                sides = VectorOps.perpendicular(VectorOps.sub(self.player.position, i[0].position), i[0].position, i[0].radius)
+                spriteAngle = [VectorOps.angleWrap(VectorOps.angle(n) - VectorOps.angle(self.player.direction)) for n in VectorOps.sub(sides, self.player.position)]
+                i.append(spriteAngle)
+                if not ((-FOV/2 < VectorOps.angleWrap(spriteAngle[0]) < FOV/2 or -FOV/2 < VectorOps.angleWrap(spriteAngle[1]) < FOV/2) and (-1.56 < VectorOps.angleWrap(spriteAngle[0]) < 1.56 and -1.56 < VectorOps.angleWrap(spriteAngle[1]) < 1.56)):
+                    sprites.remove(i)
+                    continue
+                if not (self.rayCaster.TestLoS(self.player.position, sides[0]) or self.rayCaster.TestLoS(self.player.position, sides[1])) or not (-FOV/2 < VectorOps.angleWrap(spriteAngle[0]) < FOV/2 or -FOV/2 < VectorOps.angleWrap(spriteAngle[1]) < FOV/2):
+                    sprites.remove(i)
+                    continue
+            return sprites
+
+        def drawSprites(sprites, dist = 0):
+            for i in sprites:
+                if i[1] > dist:
+                    sprites.remove(i)
+
+                    x = [int((cameraDist * math.tan(n) * 10 + 1) * width / 2) for n in i[2]]
+                    if x[1] - x[0] > self.width / 2:
+                        continue
+
+                    spriteDist = (i[1] - (cameraDist / math.cos((i[2][0] + i[2][1]) / 2))) * math.cos((i[2][0] + i[2][1]) / 2) #transform to non-euclidean
+                    y = int((self.height / 3)/(spriteDist))
+                    
+                    Sprite = pygame.transform.scale(i[0].sprite, (x[1] - x[0], y)).convert_alpha()
+                    color = [int(255 / i[1]) if 255 / i[1] > 0 and i[1] > 1 else 255 if i[1] <= 1 else 0 for n in [0,1,2]]
+                    Sprite.fill(color, special_flags=pygame.BLEND_RGB_MULT)
+                    self.screen.blit(Sprite, (x[0], (self.height - y)/2  + (self.height / 8)/(spriteDist)))
+            return sprites
+
+        self.screen.fill((0,0,0))
+        self.screen.fill((92,92,92), (0,int(self.height/2), width, int(self.height/2)))
+    
         rays = self.rayCaster.RaySweep(self.player.position,self.player.direction)
-        polygons = self.rayCaster.RenderSweep(rays)
-        
-        for i in polygons:
-            pygame.draw.polygon(self.screen, [(int(n / i[0]) if n / i[0] > 0 and i[0] > 1 else n if i[0] <= 1 else 0) for n in numToColor(map[i[2][0]][i[2][1]], i[3])], i[1], 0)    
-        
-        #for i in self.enemies:
-        #    if self.rayCaster.TestLoS(self.player.position, i.position):
-        #        print(VectorOps.angle(self.player.direction) - VectorOps.angle([i - j for i,j in zip(i.position, self.player.position)]))
-        #        if -1.5 < VectorOps.angle(self.player.direction) - VectorOps.angle([i - j for i,j in zip(i.position, self.player.position)]) < 1.5:
-        #            self.screen.blit(i.sprite, (int(width/2),0))
+        polygons = self.rayCaster.RenderSweep(rays, sort=True)
+
+        sprites = generateSpriteList()
+
+        for i in reversed(polygons):
+            sprites = drawSprites(sprites, i[0])
+            pygame.draw.polygon(self.screen, [(int(n / i[0]) if n / i[0] > 0 and i[0] > 1 else n if i[0] <= 1 else 0) for n in numToColor(map[i[2][0]][i[2][1]], i[3])], i[1], 0)
+        drawSprites(sprites)
         
         pygame.display.update()
 
