@@ -1,6 +1,7 @@
 import math
 
 import VectorOps
+import ListOps
 
 def lerp(endpoints, steps):
     interpolated = [endpoints[0]]
@@ -14,14 +15,6 @@ def fpart(number):
 
 def fparta(number):
     return [i - int(i) for i in number]
-
-def sortbyindex(List, index):
-    sorter = [j for j,i in enumerate(List)]
-    sorter.sort(key = [i[index] for i in List].__getitem__)
-    temp = List[:]
-    for i, j in enumerate(sorter):
-        List[i] = temp[j]
-    return List
 
 class Screen:
     class Ray:
@@ -117,7 +110,7 @@ class Screen:
                 pass
             i += 1
         if sort:
-            polygons = sortbyindex(polygons, 0)
+            polygons = ListOps.sortbyindex(polygons, 0)
         return polygons
 
     def TestLoS(self, positionOne, positionTwo):

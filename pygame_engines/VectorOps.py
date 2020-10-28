@@ -6,6 +6,9 @@ def sub(minuend, subtrahend):
     else:
         return [j - k for j,k in zip(minuend, subtrahend)]
 
+def swap(vector):
+    return [i for i in reversed(vector)]
+
 def angleWrap(angle, ran = [-1,1]):
     ran = [ran[0] * math.pi, ran[1] * math.pi]
     while not (ran[0] < angle < ran[1]):
@@ -44,7 +47,7 @@ def shift(vector, magnitude, angle1):
     return [vector[0] + magnitude * math.sin(angle1), vector[1] + magnitude * math.cos(angle1)]
 
 def distance(vector1, vector2):
-    return ((vector1[0] - vector2[1])**2 + (vector1[1] - vector2[1])**2)**(1/2)
+    return ((vector1[0] - vector2[0])**2 + (vector1[1] - vector2[1])**2)**(1/2)
 
 def pointPerpendicular(point1, point2, magnitude):
     perp = angle([j-i for i,j in zip(point1, point2)]) + math.pi/2
