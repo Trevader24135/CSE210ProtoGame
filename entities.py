@@ -2,10 +2,8 @@ import sys
 sys.path.append('pygame_engines')
 
 import VectorOps
+import pgRenderer as Renderer
 from mapTools import map
-
-from pygame import image
-goblinSprite = image.load("assets\\goblin.png")
 
 class Object:
     def __init__(self, position = [0,0], velocity = [0,0], sprite = "", health = 100, radius = 0.25, height = 2/3, speed = 1.5):
@@ -22,7 +20,6 @@ class Object:
             return map[int(self.position[0]) + direction[0]][int(self.position[1]) + direction[1]]
         
         def checkCollision(direction): #run 2 checks in each direction, at each side of the player
-            
             if direction[0] > 0 and mapRel((1,0)) > 0 and VectorOps.fpart(self.position[0]) > 1 - self.radius:
                 direction[0] = 0
             elif direction[0] < 0 and mapRel((-1,0)) > 0 and VectorOps.fpart(self.position[0]) < self.radius:
@@ -38,4 +35,4 @@ class Object:
 
 class Goblin(Object):
     def __init__(self, position = [3.5, 3.5]):
-        super().__init__(position = position, sprite = goblinSprite, height = 1/2)
+        super().__init__(position = position, sprite = Renderer.goblinSprite, height = 1/2)

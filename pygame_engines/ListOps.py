@@ -5,3 +5,10 @@ def sortbyindex(List, index):
     for i, j in enumerate(sorter):
         List[i] = temp[j]
     return List
+
+def lerp(endpoints, steps):
+    interpolated = [endpoints[0]]
+    delta = (endpoints[1] - endpoints[0]) / (steps - 1)
+    for i in range(steps - 1):
+        interpolated.append(interpolated[i] + delta)
+    return interpolated

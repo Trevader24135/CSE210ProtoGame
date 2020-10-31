@@ -1,0 +1,1 @@
+debugLevel = 0 #0:none 1: indicators 2:wire walls

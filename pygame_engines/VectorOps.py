@@ -6,6 +6,24 @@ def sub(minuend, subtrahend):
     else:
         return [j - k for j,k in zip(minuend, subtrahend)]
 
+def add(addend1, addend2):
+    if type(addend2) == list: 
+        return [j + k for j,k in zip(addend1, addend2)]
+    else:
+        return [j + addend2 for j in addend1]
+
+def addNormal(addend1, addend2):
+    if type(addend2) == list: 
+        return normalize([j + k for j,k in zip(addend1, addend2)])
+    else:
+        return normalize([j + addend2 for j in addend1])
+
+def divide(dividend, divisor):
+    if type(divisor) == list: 
+        return [j / k for j,k in zip(dividend, divisor)]
+    else:
+        return [j / divisor for j in dividend]
+
 def swap(vector):
     return [i for i in reversed(vector)]
 
@@ -32,11 +50,23 @@ def angle(vector):
     else:
         return math.pi - ang if vector[0] > 0 else math.pi + ang
 
-def length(vector):
-    return sum([i**2 for i in vector])**(1/2)
+def angVec(ang):
+    return [math.sin(ang), math.cos(ang)]
 
 def normalize(vector):
     return [i / length(vector) for i in vector]
+
+def length(vector):
+    return sum([i**2 for i in vector])**(1/2)
+
+def difLen(vector1, vector2):
+    return length(sub(vector2,vector1))
+
+def difLenNormal(vector1, vector2):
+    return length(sub(normalize(vector2),normalize(vector1)))
+
+def distance(vector1, vector2):
+    return ((vector1[0] - vector2[0])**2 + (vector1[1] - vector2[1])**2)**(1/2)
 
 def rotate(vector, angle):
     return [vector[0] * math.cos(-angle) - vector[1] * math.sin(-angle), vector[0] * math.sin(-angle) + vector[1] * math.cos(-angle)]
@@ -46,12 +76,16 @@ def shift(vector, magnitude, angle1):
         angle1 = angle(angle1)
     return [vector[0] + magnitude * math.sin(angle1), vector[1] + magnitude * math.cos(angle1)]
 
-def distance(vector1, vector2):
-    return ((vector1[0] - vector2[0])**2 + (vector1[1] - vector2[1])**2)**(1/2)
-
-def pointPerpendicular(point1, point2, magnitude):
-    perp = angle([j-i for i,j in zip(point1, point2)]) + math.pi/2
-    return ([i + rotate((0,magnitude), perp)[j] for j, i in enumerate(point2)],point2,[i - rotate((0,magnitude), perp)[j] for j, i in enumerate(point2)])
+def vLerp(vector1, vector2, steps):
+    steps += 1
+    ang = abs(angle(vector1) - angle(vector2))
+    dang = (ang if ang <= math.pi else (2 * math.pi) - ang) / steps
+    vecs = [vector1]
+    ang = 0
+    for i in range(steps):
+        ang += dang
+        vecs.append(rotate(vector1,ang))
+    return vecs
 
 def perpendicular(vector, point, magnitude):
     if type(vector) == list or type(vector) == tuple:
@@ -60,6 +94,12 @@ def perpendicular(vector, point, magnitude):
         perp = vector + math.pi/2
     return ([i + rotate((0,magnitude), perp)[j] for j, i in enumerate(point)],[i - rotate((0,magnitude), perp)[j] for j, i in enumerate(point)])
 
+def pointPerpendicular(point1, point2, magnitude):
+    perp = angle([j-i for i,j in zip(point1, point2)]) + math.pi/2
+    return ([i + rotate((0,magnitude), perp)[j] for j, i in enumerate(point2)],point2,[i - rotate((0,magnitude), perp)[j] for j, i in enumerate(point2)])
+
 if __name__ == "__main__":
-    pass
-    #print(angleWrap(-10))
+    print(
+        vLerp([-1,1],[1,1],2)[1:3]
+    )
+    
