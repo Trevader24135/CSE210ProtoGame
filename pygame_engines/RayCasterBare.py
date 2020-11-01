@@ -5,8 +5,6 @@ import VectorOps
 import ListOps
 import DataOps
 
-PreSweepSubdivisions = 2
-
 class Screen:
     class Ray:
         def __init__(self, position, direction, angle, cameraDist): #origin of ray, forward direction of player (for non-euclidean distance), angle of ray
@@ -53,63 +51,64 @@ class Screen:
                 ni = self.NextIntercept()
             return ni
 
-    def __init__(self, mapData, width = 640, height = 480, cameraDist = 0.1, supersampling = 1, debug = False):
+    def __init__(self, mapData, width = 640, height = 480, cameraDist = 0.1, supersampling = 1, Renderer = None):
         global map
         map = mapData
         self.width = width
         self.height = height
         self.cameraDist = cameraDist
         self.supersampling = supersampling
-        self.debug = debug
+        self.Renderer = Renderer
     
-    def RaySweep(self, position, direction, simplify = False, Renderer = None):
-        direction = VectorOps.angle(direction)
-        rayscast = 0
-        rays = []
-        
-        if simplify:
-            preSweep = [self.Ray(position, VectorOps.normalize([i,self.cameraDist]), direction, self.cameraDist).Cast() for i in [-0.1,0.1]]
-            rayscast += len(preSweep)
-            i = 0
-            while i < len(preSweep) - 1:
-                if (preSweep[i][3] != preSweep[i+1][3] or preSweep[i][4] != preSweep[i+1][4]) and VectorOps.difLen(preSweep[i][5], preSweep[i+1][5]) > 0.00025: #there is a change between these two rays
-                    preSweep.insert(i+1, self.Ray(position, VectorOps.add(preSweep[i][5],preSweep[i+1][5]), direction, self.cameraDist).Cast() )
-                    #for j,k in enumerate(VectorOps.vLerp(preSweep[i][5], preSweep[i+1][5], PreSweepSubdivisions)[1:PreSweepSubdivisions+1]):
-                    #    preSweep.insert(i+j+1, self.Ray(position, k, direction, self.cameraDist).Cast() )
-                    rayscast += 1
-                else:
-                    i += 1
-            if config.debugLevel >= 1 and Renderer != None:
-                Renderer.debugRays(preSweep)
-
-            rays.append(preSweep.pop(0))
-            last = rays[-1]
-            while len(preSweep) > 1:
-                if rays[-1][4] == preSweep[0][4] and rays[-1][3] == preSweep[0][3]:
-                    if not ((-1 <= last[3][0] - preSweep[1][3][0] <= 1 and last[3][1] == preSweep[1][3][1]) or (-1 <= last[3][1] - preSweep[1][3][1] <= 1 and last[3][0] == preSweep[1][3][0]) or (-0.7 <= last[0] - preSweep[1][0] <= 0.7)):
-                        edge = preSweep.pop(0)
-                        edge[5] = preSweep[0][5]
-                        rays.append(edge)
-                        last = rays[-1]
-                    else:
-                        last = preSweep.pop(0)
-                else:
-                    rays.append(preSweep.pop(0))
+    def SimplifyPolygons(self, preSweep):
+        rays = [preSweep.pop(0)]
+        last = rays[-1]
+        while len(preSweep) > 1:
+            if rays[-1][4] == preSweep[0][4] and rays[-1][3] == preSweep[0][3]:
+                if not ((-1 <= last[3][0] - preSweep[1][3][0] <= 1 and last[3][1] == preSweep[1][3][1]) or (-1 <= last[3][1] - preSweep[1][3][1] <= 1 and last[3][0] == preSweep[1][3][0]) or (-0.7 <= last[0] - preSweep[1][0] <= 0.7)):
+                    edge = preSweep.pop(0)
+                    edge[5] = preSweep[0][5]
+                    rays.append(edge)
                     last = rays[-1]
-            if len(preSweep) > 0:
+                else:
+                    last = preSweep.pop(0)
+            else:
                 rays.append(preSweep.pop(0))
+                last = rays[-1]
+        if len(preSweep) > 0:
+            rays.append(preSweep.pop(0))
 
-            if config.debugLevel >= 1 and Renderer != None:
-                Renderer.debugRays(rays, color='red', length=20)
-        else:
-            columns = [[i,self.cameraDist] for i in ListOps.lerp((-0.10, 0.10),int(self.width / self.supersampling))]
-            for angle in columns:
-                rays.append(self.Ray(position, angle, direction, self.cameraDist).Cast())
-                rayscast += 1
-            if config.debugLevel >= 1 and Renderer != None:
-                Renderer.debugRays(rays)
-        #print("rays:",rayscast,len(rays))
+        if config.debugLevel >= 1 and self.Renderer != None:
+            self.Renderer.debugRays(rays, color='red', length=20)
+
         return rays
+
+    def RaySearch(self, position, direction, simplify = True):
+        direction = VectorOps.angle(direction)
+        preSweep = [self.Ray(position, VectorOps.normalize([i,self.cameraDist]), direction, self.cameraDist).Cast() for i in [-0.1,0.1]]
+        i = 0
+        while i < len(preSweep) - 1:
+            if (preSweep[i][3] != preSweep[i+1][3] or preSweep[i][4] != preSweep[i+1][4]) and VectorOps.difLen(preSweep[i][5], preSweep[i+1][5]) > 0.00025: #there is a change between these two rays
+                preSweep.insert(i+1, self.Ray(position, VectorOps.add(preSweep[i][5],preSweep[i+1][5]), direction, self.cameraDist).Cast() )
+            else:
+                i += 1
+
+        if config.debugLevel >= 1 and self.Renderer != None:
+            self.Renderer.debugRays(preSweep)
+
+        return (self.SimplifyPolygons(preSweep) if simplify else preSweep)
+
+    def RaySweep(self, position, direction, simplify = True):
+        direction = VectorOps.angle(direction)
+        preSweep = []
+        columns = [[i,self.cameraDist] for i in ListOps.lerp((-0.10, 0.10),int(self.width / self.supersampling))]
+        for angle in columns:
+            preSweep.append(self.Ray(position, angle, direction, self.cameraDist).Cast())
+
+        if config.debugLevel >= 1 and self.Renderer != None:
+            self.Renderer.debugRays(preSweep)
+        
+        return (self.SimplifyPolygons(preSweep) if simplify else preSweep)
 
     def RenderSweep(self, rays, sort = False):
         polygons = []

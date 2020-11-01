@@ -17,7 +17,7 @@ FOV = 100
 width = 640
 height = 480
 hudHeight = 100
-supersampling = 5
+supersampling = 4
 
 FOV *= math.pi / 180
 cameraDist = 0.1 / math.tan(FOV / 2)
@@ -30,18 +30,17 @@ class Player(entities.Object):
 
 class Game:
     def __init__(self):
+        self.screen = Renderer(width, height, hudHeight)
+
         self._running = True
         self.keysHeld = []
-        self.rayCaster = RayCaster.Screen(mapTools.map, width = width, height = height - hudHeight, supersampling = supersampling, cameraDist = cameraDist, debug = False)
+        self.rayCaster = RayCaster.Screen(mapTools.map, width = width, height = height - hudHeight, supersampling = supersampling, cameraDist = cameraDist, Renderer=self.screen)
         self.loopTime, self.fpsTime, self.fps = 0, 0, 0
         self.player = Player()
         self.enemies = [
             entities.Goblin(position = [7.8,3.9]),
             entities.Goblin(position = [7.8,5.1])
         ]
-
-        self.screen = Renderer(width, height, hudHeight)
-
         self.gui = GUI.Hud(self.screen, self.player)
         
     def on_event(self, event):
@@ -104,7 +103,8 @@ class Game:
 
         self.screen.drawBG()
 
-        rays = self.rayCaster.RaySweep(self.player.position,self.player.direction, True, self.screen)
+        #rays = self.rayCaster.RaySweep(self.player.position,self.player.direction, simplify=True)
+        rays = self.rayCaster.RaySearch(self.player.position,self.player.direction, simplify=True)
         polygons = self.rayCaster.RenderSweep(rays, sort=True)
 
         sprites = generateSpriteList()
