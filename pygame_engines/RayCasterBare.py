@@ -88,7 +88,7 @@ class Screen:
         preSweep = [self.Ray(position, VectorOps.normalize([i,self.cameraDist]), direction, self.cameraDist).Cast() for i in [-0.1,0.1]]
         i = 0
         while i < len(preSweep) - 1:
-            if (preSweep[i][3] != preSweep[i+1][3] or preSweep[i][4] != preSweep[i+1][4]) and VectorOps.difLen(preSweep[i][5], preSweep[i+1][5]) > 0.00025: #there is a change between these two rays
+            if (preSweep[i][3] != preSweep[i+1][3] or preSweep[i][4] != preSweep[i+1][4]) and VectorOps.difLen(preSweep[i][5], preSweep[i+1][5]) > 0.0001: #there is a change between these two rays
                 preSweep.insert(i+1, self.Ray(position, VectorOps.add(preSweep[i][5],preSweep[i+1][5]), direction, self.cameraDist).Cast() )
             else:
                 i += 1
@@ -114,37 +114,32 @@ class Screen:
         polygons = []
         i = 0
         lastWasException = False
-        while i < len(rays):
-            try:
-                if rays[i][5] == rays[i+1][5]:
-                    i += 1
-                    continue
-                rectHeightOne = (self.height / 4)/(rays[i][0])
+        while i < len(rays) - 1:
+            if rays[i][5] == rays[i+1][5]:
+                i += 1
+                continue
+            rectHeightOne = (self.height / 4)/(rays[i][0])
 
-                if i < len(rays):
-                    close = (-1 <= rays[i][3][0] - rays[i+1][3][0] <= 1 and -1 <= rays[i][3][1] - rays[i+1][3][1] <= 1)
-                    if close: #if they're the same block or close, connect the edges
-                        rectHeightTwo = (self.height / 4)/(rays[i+1][0])
-                        lastWasException = False
-                    elif not lastWasException: #left edge is closer, follow left slope
-                        rectHeightTwo = rectHeightOne - ((self.height / 4)/(rays[i-1][0]) - rectHeightOne)
-                        lastWasException = True
-                    else:
-                        rectHeightTwo = (self.height / 4)/(rays[i][0])
-                        lastWasException = False
-                else:
-                    rectHeightTwo = rectHeightOne - ((self.height / 4)/(rays[i-1][0]) - rectHeightOne) #right edge of screen, follow previous slope to approximate out-of-range value
+            close = (-1 <= rays[i][3][0] - rays[i+1][3][0] <= 1 and -1 <= rays[i][3][1] - rays[i+1][3][1] <= 1)
+            if close: #if they're the same block or close, connect the edges
                 rectHeightTwo = (self.height / 4)/(rays[i+1][0])
-                corners = [
-                    [int(DataOps.map(rays[i][5][0], rays[0][5][0], -rays[0][5][0], 0, 640)), int(self.height/2 + rectHeightOne)],
-                    [int(DataOps.map(rays[i+1][5][0], rays[0][5][0], -rays[0][5][0], 0, 640)), int(self.height/2 + rectHeightTwo)],
-                    [int(DataOps.map(rays[i+1][5][0], rays[0][5][0], -rays[0][5][0], 0, 640)), int(self.height/2 - rectHeightTwo)],
-                    [int(DataOps.map(rays[i][5][0], rays[0][5][0], -rays[0][5][0], 0, 640)), int(self.height/2 - rectHeightOne)]
-                ]
+                lastWasException = False
+            elif not lastWasException: #left edge is closer, follow left slope
+                rectHeightTwo = rectHeightOne - ((self.height / 4)/(rays[i-1][0]) - rectHeightOne)
+                lastWasException = True
+            else:
+                rectHeightTwo = (self.height / 4)/(rays[i][0])
+                lastWasException = False
 
-                polygons.append([(rays[i][1] if (rays[i][1] > rays[i+1][1]) else rays[i+1][1]), corners, (rays[i][3][0],rays[i][3][1]), rays[i][4]])
-            except:
-                pass
+            corners = [
+                [int(DataOps.map(rays[i][5][0], rays[0][5][0], -rays[0][5][0], 0, 640)), int(self.height/2 + rectHeightOne)],
+                [int(DataOps.map(rays[i+1][5][0], rays[0][5][0], -rays[0][5][0], 0, 640)), int(self.height/2 + rectHeightTwo)],
+                [int(DataOps.map(rays[i+1][5][0], rays[0][5][0], -rays[0][5][0], 0, 640)), int(self.height/2 - rectHeightTwo)],
+                [int(DataOps.map(rays[i][5][0], rays[0][5][0], -rays[0][5][0], 0, 640)), int(self.height/2 - rectHeightOne)]
+            ]
+
+            polygons.append([(rays[i][1] if (rays[i][1] > rays[i+1][1]) else rays[i+1][1]), corners, rays[i][3], rays[i][4], [rays[i][2], rays[i+1][2]]] )
+            #polygon (0: CLOSEST 1: CORNERS 2: ENDTILE 3: TILESIDE 4: ENDPOSITION)
             i += 1
         if sort:
             polygons = ListOps.sortbyindex(polygons, 0)

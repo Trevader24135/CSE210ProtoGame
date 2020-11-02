@@ -1,3 +1,7 @@
+import sys
+sys.path.append('pygame_engines')
+import config
+
 def genMap():
     def tile(colors):
         colors = [str(n) for n in colors]
@@ -5,9 +9,9 @@ def genMap():
         colors = sum([sum([int(n) << (6 - m*3) for m,n in enumerate(i)]) << (27 - j * 9) for j,i in enumerate(colors)])
         return colors
     #[[Scolor],[Wcolor],[Ncolor],[Ecolor]]
-    gw = tile([333,333,333,333])
+    gw = tile([333,333,333,333]) # 29451204315
     rb = tile([700,70,7,707])
-
+    
     return [
         [gw, gw, gw, gw, gw, gw, gw],
         [gw, 0, gw, 0, 0, 0, gw], 

@@ -5,7 +5,7 @@ import config
 import math
 import time
 
-from pgRenderer import pgRenderer as Renderer
+import pgRenderer as Renderer
 import RayCasterBare as RayCaster
 import VectorOps
 import ListOps
@@ -21,7 +21,6 @@ supersampling = 4
 
 FOV *= math.pi / 180
 cameraDist = 0.1 / math.tan(FOV / 2)
-viewportMid = (height - hudHeight) / 2
 
 class Player(entities.Object):
     def __init__(self):
@@ -30,7 +29,7 @@ class Player(entities.Object):
 
 class Game:
     def __init__(self):
-        self.screen = Renderer(width, height, hudHeight)
+        self.screen = Renderer.pgRenderer(width, height, cameraDist=cameraDist)
 
         self._running = True
         self.keysHeld = []
@@ -84,35 +83,21 @@ class Game:
                     continue
             return sprites
 
-        def drawSprites(sprites, dist = 0):
-            for sprite in reversed(sprites):
-                if sprite[1] > dist:
-                    sprites.remove(sprite)
-                    x = [int((cameraDist * math.tan(n) * 10 + 1) * width / 2) for n in sprite[2]]
-                    spriteDist = (sprite[1] - (cameraDist / math.cos((sprite[2][0] + sprite[2][1]) / 2))) * math.cos((sprite[2][0] + sprite[2][1]) / 2) #transform to non-euclidean
-                    spriteHeight = int(((viewportMid) * sprite[0].height)/(spriteDist))
-                    spriteCorners = [x[0], (viewportMid) + ((height-hudHeight) / 4)/(spriteDist) - spriteHeight, x[1] - x[0], int(((viewportMid) * sprite[0].height)/(spriteDist))]
-                    if spriteCorners[2] > width:
-                        continue
-
-                    if config.debugLevel >= 1:
-                        self.screen.debugSprites(spriteCorners)
-                    
-                    self.screen.drawSprite(sprite[0].sprite, spriteCorners, sprite[1])
-            return sprites
-
         self.screen.drawBG()
 
-        #rays = self.rayCaster.RaySweep(self.player.position,self.player.direction, simplify=True)
-        rays = self.rayCaster.RaySearch(self.player.position,self.player.direction, simplify=True)
+        if config.FullScreenSweep:
+            rays = self.rayCaster.RaySweep(self.player.position,self.player.direction, simplify=True)
+        else:
+            rays = self.rayCaster.RaySearch(self.player.position,self.player.direction, simplify=True)
+
         polygons = self.rayCaster.RenderSweep(rays, sort=True)
 
         sprites = generateSpriteList()
         
-        for i in reversed(polygons):
-            sprites = drawSprites(sprites, i[0])
-            self.screen.drawWall(mapTools.numToColor(mapTools.map[i[2][0]][i[2][1]], i[3]), i[1], i[0])
-        drawSprites(sprites)
+        if config.texturedWalls == True:
+            self.screen.renderTextured(polygons, sprites)
+        else:
+            self.screen.render(polygons, sprites)
 
         self.gui.drawHud()
 
