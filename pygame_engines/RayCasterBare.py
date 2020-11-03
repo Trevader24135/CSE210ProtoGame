@@ -39,15 +39,15 @@ class Screen:
                 distance,
                 self.position,
                 [int((i if j > 0 else i - 0.001 if i - 0.001 >= 0 else 0)) for i,j in zip(self.position, self.direction)],
-                ['N' if (DataOps.fpart(self.position[1]) < 0.000000001 or DataOps.fpart(self.position[1]) > 0.999999999) and self.direction[1] > 0 else
+                ('N' if (DataOps.fpart(self.position[1]) < 0.000000001 or DataOps.fpart(self.position[1]) > 0.999999999) and self.direction[1] > 0 else
                  'S' if (DataOps.fpart(self.position[1]) < 0.000000001 or DataOps.fpart(self.position[1]) > 0.999999999) and self.direction[1] <= 0 else
                  'E' if (DataOps.fpart(self.position[0]) < 0.000000001 or DataOps.fpart(self.position[0]) > 0.999999999) and self.direction[0] > 0 else
-                 'W' if (DataOps.fpart(self.position[0]) < 0.000000001 or DataOps.fpart(self.position[0]) > 0.999999999) and self.direction[0] <= 0 else 'O'],
+                 'W' if (DataOps.fpart(self.position[0]) < 0.000000001 or DataOps.fpart(self.position[0]) > 0.999999999) and self.direction[0] <= 0 else 'O'),
                  self.directionOriginal]
 
         def Cast(self): #CAST RETURNS [0:Distance, 1:EuclidDistance, 2:endPosition, 3:endTile, 4:tileSide, 5:originalDirection]
             ni = self.NextIntercept()
-            while map[ni[3][0]][ni[3][1]] <= 0:
+            while type(map[ni[3][0]][ni[3][1]]) == int:
                 ni = self.NextIntercept()
             return ni
 
@@ -88,7 +88,7 @@ class Screen:
         preSweep = [self.Ray(position, VectorOps.normalize([i,self.cameraDist]), direction, self.cameraDist).Cast() for i in [-0.1,0.1]]
         i = 0
         while i < len(preSweep) - 1:
-            if (preSweep[i][3] != preSweep[i+1][3] or preSweep[i][4] != preSweep[i+1][4]) and VectorOps.difLen(preSweep[i][5], preSweep[i+1][5]) > 0.0001: #there is a change between these two rays
+            if (preSweep[i][3] != preSweep[i+1][3] or preSweep[i][4] != preSweep[i+1][4]) and VectorOps.difLen(preSweep[i][5], preSweep[i+1][5]) > 0.0005: #there is a change between these two rays
                 preSweep.insert(i+1, self.Ray(position, VectorOps.add(preSweep[i][5],preSweep[i+1][5]), direction, self.cameraDist).Cast() )
             else:
                 i += 1

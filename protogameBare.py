@@ -6,6 +6,7 @@ import math
 import time
 
 import pgRenderer as Renderer
+import SoundEngine
 import RayCasterBare as RayCaster
 import VectorOps
 import ListOps
@@ -18,6 +19,8 @@ width = 640
 height = 480
 hudHeight = 100
 supersampling = 4
+FogofWar = 7.5
+
 
 FOV *= math.pi / 180
 cameraDist = 0.1 / math.tan(FOV / 2)
@@ -26,11 +29,12 @@ class Player(entities.Object):
     def __init__(self):
         super().__init__(position = [3.5,3.5])
         self.direction = VectorOps.normalize((-1,0))
+        self.walking = False
 
 class Game:
     def __init__(self):
-        self.screen = Renderer.pgRenderer(width, height, cameraDist=cameraDist)
-
+        self.screen = Renderer.pgRenderer(width, height, cameraDist=cameraDist, FogofWar=FogofWar)
+        
         self._running = True
         self.keysHeld = []
         self.rayCaster = RayCaster.Screen(mapTools.map, width = width, height = height - hudHeight, supersampling = supersampling, cameraDist = cameraDist, Renderer=self.screen)
@@ -41,6 +45,9 @@ class Game:
             entities.Goblin(position = [7.8,5.1])
         ]
         self.gui = GUI.Hud(self.screen, self.player)
+
+        self.soundManager = SoundEngine.SoundManager()
+        self.player.walking = False
         
     def on_event(self, event):
         if event[0] == 'QUIT':
@@ -58,8 +65,12 @@ class Game:
                 self.player.direction = VectorOps.rotate(self.player.direction, 3.14 * self.deltaTime)
             if 'up' in self.keysHeld:
                 self.player.move(VectorOps.rotate((0,self.player.maxSpeed * self.deltaTime),VectorOps.angle(self.player.direction)))
+                self.player.walking = 'forward'
             elif 'down' in self.keysHeld:
-                self.player.move(VectorOps.rotate((0,-self.player.maxSpeed * self.deltaTime),VectorOps.angle(self.player.direction)))
+                self.player.move(VectorOps.rotate((0,-self.player.maxSpeed * self.deltaTime * 0.5),VectorOps.angle(self.player.direction)))
+                self.player.walking = 'backward'
+            else:
+                self.player.walking = False
         
         playerMovement()
 
@@ -108,6 +119,14 @@ class Game:
                 
         self.screen.update()
 
+    def manageSounds(self):
+        if self.player.walking != False:
+            self.soundManager.startSound(walking=True, walkDelay=(0.75 if self.player.walking == 'forward' else 1))
+        else:
+            self.soundManager.startSound(walking=False)
+
+        self.soundManager.playSounds()
+
     def timer(self):
         self.deltaTime = time.perf_counter() - self.loopTime
         self.loopTime = time.perf_counter()
@@ -125,6 +144,7 @@ class Game:
                 self.on_event(i)
             self.loop()
             self.on_render()
+            self.manageSounds()
 
 def mainLaunch(renderer = ''):
     controller = Game()

@@ -2,7 +2,11 @@ import config
 
 import math
 import pygame
+
 import mapTools
+
+pygame.init()
+
 
 if config.debugLevel >= 1:
     import DataOps
@@ -13,28 +17,32 @@ if config.texturedWalls:
     import DataOps
     import VectorOps
     import ListOps
-    MissingTexture = pygame.image.load("assets\\MissingTexture2.png")
-    wallSprite = pygame.image.load("assets\\Wall32T.png")
+    MissingTexture = pygame.image.load("assets\\Walls\\MissingTexture2.png")
 
     colorToTexture = {
-        "109109109":wallSprite
+        "109109109":pygame.image.load("assets\\Walls\\Wall32T.png"),
+        "110109109":pygame.image.load("assets\\Walls\\Wall32TRustedChains.png")
     }
 
-goblinSprite = pygame.image.load("assets\\goblin.png")
+goblinSprite = pygame.image.load("assets\\Mobs\\goblin.png")
 
 class pgRenderer:
-    def __init__(self, width, height, cameraDist = 0.1, hudHeight = 100):
-        pygame.init()
+    def __init__(self, width, height, cameraDist = 0.1, hudHeight = 100, FogofWar=5):
         self.size = self.width, self.height = width, height
         self.screen = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.SCALED) # | pygame.FULLSCREEN
         
         self.cameraDist = cameraDist
         self.hudHeight = hudHeight
         self.viewportMid = (self.height - self.hudHeight) / 2
+        self.FogofWar = FogofWar
         
-        global hud
-        hud = pygame.image.load("assets\\hud.png")
-        hud = pygame.transform.scale(hud, (self.width, hud.get_height()))
+        self.hud = pygame.image.load("assets\\HUD\\hud.png")
+        self.hud = pygame.transform.scale(self.hud, (self.width, self.hud.get_height()))
+
+        self.background = pygame.Surface((self.width,self.height))
+        self.background.fill((0,0,0))
+        for i in range(0,80):
+            pygame.draw.ellipse(self.background, [i,i,i], (-self.width/2, int((self.height - self.hudHeight)/2 + i * 2.5), 2 * self.width, self.height))
     
     def debugSprites(self, corner):
         pygame.draw.circle(self.screen, 'blue', [corner[0] + (corner[2])/2,10], 5)
@@ -52,12 +60,17 @@ class pgRenderer:
         self.screen.blit(text, ((self.width - 36)/2,25))
 
     def drawBG(self):
-        self.screen.fill((0,0,0))
-        self.screen.fill((80,80,80), (0,int((self.height - self.hudHeight)/2), self.width, int((self.height - self.hudHeight)/2)))
+        self.screen.blit(self.background, (0,0))
+        #self.screen.fill((80,80,80), (0,int((self.height - self.hudHeight)/2), self.width, int((self.height - self.hudHeight)/2)))
+
+    def FogofWarColor(self, distance):
+        return (255 * (self.FogofWar + 1)**(1/2)) / ( ((self.FogofWar + 1)**(1/2) - 1) * (distance + 1)**(1/2) ) - (255 / ((self.FogofWar + 1)**(1/2) - 1) )
 
     def drawSprite(self, sprite, corners, distance):
         image = pygame.transform.scale(sprite, (corners[2], corners[3])).convert_alpha()
-        color = [int(255 / distance) if 255 / distance > 0 and distance > 1 else 255 if distance <= 1 else 0 for n in [0,1,2]]
+        #color = [int(255 / distance) if 255 / distance > 0 and distance > 1 else 255 if distance <= 1 else 0 for n in [0,1,2]]
+        color = self.FogofWarColor(distance)
+        color = [int(color) if color > 0 else 0 for n in [0,1,2]]
         image.fill(color, special_flags=pygame.BLEND_RGB_MULT)
         
         self.screen.blit(image, (corners[0], corners[1] ))
@@ -80,9 +93,9 @@ class pgRenderer:
         return sprites
 
     def render(self, polygons, sprites):
-        for i in reversed(polygons):
-            self.drawSprites(sprites, i[0])
-            pygame.draw.polygon(self.screen, [(int(n / (i[0]+1)) if n / i[0] > 0 else 0) for n in mapTools.numToColor(mapTools.map[i[2][0]][i[2][1]], i[3]) ],  i[1], 1 if config.debugLevel >= 2 else 0)
+        for polygon in reversed(polygons):
+            sprites = self.drawSprites(sprites, polygon[0])
+            pygame.draw.polygon(self.screen, [(int(n - (n * polygon[0]) / (self.FogofWar)) if n - (n * polygon[0]) / (self.FogofWar) > 0 else 0) for n in mapTools.map[polygon[2][0]][polygon[2][1]][mapTools.directions[polygon[3]]] ],  polygon[1], 1 if config.debugLevel >= 2 else 0)
         self.drawSprites(sprites)
 
     def renderTextured(self, polygons, sprites):
@@ -107,7 +120,9 @@ class pgRenderer:
         def scaleHeight(px):
             return heightOne * ((wall.get_width() - px) / width) + heightTwo * ((px) / width)
         def darkenSprite(polygon):
-            color = [int(255 / (0.5 + polygon[0])) if 0 < (255 / (0.5 + polygon[0])) < 255 else 0 if (255 / (0.5 + polygon[0])) < 0 else 255 for n in [0,1,2]]
+            #color = [int(255 / (0.5 + polygon[0])) if 0 < (255 / (0.5 + polygon[0])) < 255 else 0 if (255 / (0.5 + polygon[0])) < 0 else 255 for n in [0,1,2]]
+            color = self.FogofWarColor(polygon[0])
+            color = [int(color)  if color > 0 else 0 for n in [0,1,2]]
             sprite.fill(color, special_flags=pygame.BLEND_RGB_MULT)
         def getDimmensions(polygon):
             return (polygon[1][1][0] - polygon[1][0][0]),(polygon[1][0][1] - polygon[1][3][1]),(polygon[1][1][1] - polygon[1][2][1])
@@ -132,26 +147,30 @@ class pgRenderer:
                 pygame.draw.polygon(wall, [0,0,0,0],  [[0, wall.get_height()], [wall.get_width(), wall.get_height()], [0,wall.get_height() - deltay]], 1 if config.debugLevel >= 2 else 0)      
         
         for polygon in reversed(polygons):
-            self.drawSprites(sprites, polygon[0])
-            color = mapTools.numToColor(mapTools.map[polygon[2][0]][polygon[2][1]], polygon[3])
+            sprites = self.drawSprites(sprites, polygon[0])
+            if polygon[0] < self.FogofWar:
+                
+                color = mapTools.map[polygon[2][0]][polygon[2][1]][mapTools.directions[polygon[3]]]
+                
+                sprite = getTexture(polygon)
 
-            sprite = getTexture(polygon)
+                if not (0.95 < VectorOps.distance(polygon[4][0],polygon[4][1]) < 1.05):
+                    sprite = cutTexture(sprite, polygon[4])
 
-            if not (0.95 < VectorOps.distance(polygon[4][0],polygon[4][1]) < 1.05):
-                sprite = cutTexture(sprite, polygon[4])
-
-            darkenSprite(polygon)
-            width, heightOne, heightTwo = getDimmensions(polygon)
-            
-            wall = pygame.Surface((width,heightOne if heightOne > heightTwo else heightTwo)).convert_alpha()
-            wall.fill([0,0,0,0])
-            blitSprite(polygon)
-            smoothEdges(polygon)
-            self.screen.blit(wall, [polygon[1][0][0], polygon[1][2][1] if polygon[1][2][1] < polygon[1][3][1] else polygon[1][3][1]])
+                darkenSprite(polygon)
+                width, heightOne, heightTwo = getDimmensions(polygon)
+                
+                wall = pygame.Surface((width,heightOne if heightOne > heightTwo else heightTwo)).convert_alpha()
+                wall.fill([0,0,0,0])
+                blitSprite(polygon)
+                smoothEdges(polygon)
+                self.screen.blit(wall, [polygon[1][0][0], polygon[1][2][1] if polygon[1][2][1] < polygon[1][3][1] else polygon[1][3][1]])
+            else:
+                self.render([polygon], [])
         self.drawSprites(sprites)
         
     def drawHud(self):
-        self.screen.blit(hud, (0, self.height - self.hudHeight))
+        self.screen.blit(self.hud, (0, self.height - self.hudHeight))
 
     def update(self, rect = [0,0,0,0]):
         if rect == [0,0,0,0]:
