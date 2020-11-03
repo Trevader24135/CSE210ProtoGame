@@ -6,7 +6,7 @@ pygame.mixer.init()
 
 ambientSound = pygame.mixer.Sound("assets\\Sounds\\ambienceCave.ogg")
 
-footstep = pygame.mixer.Sound("assets\\Sounds\\footstep.ogg")
+footstep = [pygame.mixer.Sound("assets\\Sounds\\footstepCave.ogg"), pygame.mixer.Sound("assets\\Sounds\\footstepCave.ogg")]
 
 stoneDrops = [
     pygame.mixer.Sound("assets\\Sounds\\stoneDropCave01.ogg"),
@@ -24,7 +24,7 @@ tearsInRain = "assets\\Music\\sb_tearsinrain.ogg"
 class SoundManager:
     def __init__(self, randomSounds = True, ambience = True):
         Time = time.perf_counter()
-        self.walk = Sounds(footstep, volume=0.015)
+        self.foot = 0
         self.walking = False
         self.walkTime = Time
         self.walkDelay = 0.75
@@ -49,7 +49,8 @@ class SoundManager:
     def playSounds(self):
         Time = time.perf_counter()
         if self.walking and Time - self.walkTime > self.walkDelay:
-            self.walk.play()
+            Sounds(footstep[self.foot], volume=0.3).play()
+            self.foot = 0 if self.foot == 1 else 1
             self.walkTime = Time
         if self.randomSounds:
             if Time - self.rockTime > self.rockDelay:

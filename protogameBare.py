@@ -121,7 +121,7 @@ class Game:
 
     def manageSounds(self):
         if self.player.walking != False:
-            self.soundManager.startSound(walking=True, walkDelay=(0.75 if self.player.walking == 'forward' else 1))
+            self.soundManager.startSound(walking=True, walkDelay=(0.6 if self.player.walking == 'forward' else 1))
         else:
             self.soundManager.startSound(walking=False)
 
