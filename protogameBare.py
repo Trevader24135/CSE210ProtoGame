@@ -14,15 +14,11 @@ import mapTools
 import entities
 import GUI
 
-FOV = 100
 width = 640
 height = 480
-hudHeight = 100
-supersampling = 4
-FogofWar = 7.5
+hudHeight = 75
 
-
-FOV *= math.pi / 180
+FOV = (config.FOV * math.pi) / 180
 cameraDist = 0.1 / math.tan(FOV / 2)
 
 class Player(entities.Object):
@@ -33,11 +29,11 @@ class Player(entities.Object):
 
 class Game:
     def __init__(self):
-        self.screen = Renderer.pgRenderer(width, height, cameraDist=cameraDist, FogofWar=FogofWar)
+        self.screen = Renderer.pgRenderer(width, height, cameraDist=cameraDist, FogofWar=config.FogofWar, hudHeight=hudHeight)
         
         self._running = True
         self.keysHeld = []
-        self.rayCaster = RayCaster.Screen(mapTools.map, width = width, height = height - hudHeight, supersampling = supersampling, cameraDist = cameraDist, Renderer=self.screen)
+        self.rayCaster = RayCaster.Screen(mapTools.map, width = width, height = height - hudHeight, supersampling = config.supersampling, cameraDist = cameraDist, Renderer=self.screen)
         self.loopTime, self.fpsTime, self.fps = 0, 0, 0
         self.player = Player()
         self.enemies = [

@@ -20,6 +20,11 @@ if config.texturedWalls:
     MissingTexture = pygame.image.load("assets\\Walls\\MissingTexture2.png")
 
     colorToTexture = {
+        "25500":pygame.image.load("assets\\Walls\\red.png"),
+        "02550":pygame.image.load("assets\\Walls\\green.png"),
+        "00255":pygame.image.load("assets\\Walls\\blue.png"),
+        "000":pygame.image.load("assets\\Walls\\black.png"),
+        "255255255":pygame.image.load("assets\\Walls\\white.png"),
         "109109109":pygame.image.load("assets\\Walls\\Wall32T.png"),
         "110109109":pygame.image.load("assets\\Walls\\Wall32TRustedChains.png")
     }
@@ -37,7 +42,7 @@ class pgRenderer:
         self.FogofWar = FogofWar
         
         self.hud = pygame.image.load("assets\\HUD\\hud.png")
-        self.hud = pygame.transform.scale(self.hud, (self.width, self.hud.get_height()))
+        self.hud = pygame.transform.scale(self.hud, (self.width, self.hudHeight))
 
         self.background = pygame.Surface((self.width,self.height))
         self.background.fill((0,0,0))

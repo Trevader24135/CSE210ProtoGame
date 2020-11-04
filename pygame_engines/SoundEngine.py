@@ -1,6 +1,9 @@
 import pygame.mixer
 import time
 import random
+import config
+
+#Many sounds downloaded from ZapSplat.net (and modified by me)
 
 pygame.mixer.init()
 
@@ -30,7 +33,7 @@ class SoundManager:
         self.walkDelay = 0.75
 
         if ambience:
-            Sounds(ambientSound, volume=0.15).play(-1)
+            Sounds(ambientSound, volume=0.075 * config.volume).play(-1)
 
         self.randomSounds = randomSounds 
 
@@ -49,18 +52,21 @@ class SoundManager:
     def playSounds(self):
         Time = time.perf_counter()
         if self.walking and Time - self.walkTime > self.walkDelay:
-            Sounds(footstep[self.foot], volume=0.3).play()
+            Sounds(footstep[self.foot], volume=0.3 * config.volume).play()
             self.foot = 0 if self.foot == 1 else 1
             self.walkTime = Time
         if self.randomSounds:
-            if Time - self.rockTime > self.rockDelay:
-                Sounds(stoneDrops[random.randrange(0,len(stoneDrops))], volume=0.15).play()
-                self.rockTime = Time
-                self.rockDelay = random.randint(13000, 25000) / 1000
-            if Time - self.waterDripTime > self.waterDripDelay:
-                Sounds(waterDrips[random.randrange(0,len(waterDrips))], volume=0.04).play()
-                self.waterDripTime = Time
-                self.waterDripDelay = random.randint(3500, 4000) / 1000
+            self.__randomSounds(Time)
+
+    def __randomSounds(self, Time):
+        if Time - self.rockTime > self.rockDelay:
+            Sounds(stoneDrops[random.randrange(0,len(stoneDrops))], volume=0.15 * config.volume).play()
+            self.rockTime = Time
+            self.rockDelay = random.randint(13000, 25000) / 1000
+        if Time - self.waterDripTime > self.waterDripDelay:
+            Sounds(waterDrips[random.randrange(0,len(waterDrips))], volume=0.04 * config.volume).play()
+            self.waterDripTime = Time
+            self.waterDripDelay = random.randint(3500, 4000) / 1000
 
 class Sounds:
     def __init__(self, sound, volume = 1):
