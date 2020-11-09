@@ -21,11 +21,7 @@ hudHeight = 75
 FOV = (config.FOV * math.pi) / 180
 cameraDist = 0.1 / math.tan(FOV / 2)
 
-class Player(entities.Object):
-    def __init__(self):
-        super().__init__(position = [3.5,3.5])
-        self.direction = VectorOps.normalize((-1,0))
-        self.walking = False
+
 
 class Game:
     def __init__(self):
@@ -35,7 +31,7 @@ class Game:
         self.keysHeld = []
         self.rayCaster = RayCaster.Screen(mapTools.map, width = width, height = height - hudHeight, supersampling = config.supersampling, cameraDist = cameraDist, Renderer=self.screen)
         self.loopTime, self.fpsTime, self.fps = 0, 0, 0
-        self.player = Player()
+        self.player = entities.Player()
         self.enemies = [
             entities.Goblin(position = [7.8,3.9]),
             entities.Goblin(position = [7.8,5.1])
@@ -129,7 +125,7 @@ class Game:
         self.fpsTime += self.loopTime
         if self.fpsTime > 250:
             self.fps = int(1/self.deltaTime)
-            print("FPS:", self.fps)
+            #print("FPS:", self.fps)
             self.fpsTime = 0
 
     def on_execute(self):
