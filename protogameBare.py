@@ -21,21 +21,22 @@ hudHeight = 75
 FOV = (config.FOV * math.pi) / 180
 cameraDist = 0.1 / math.tan(FOV / 2)
 
-
-
 class Game:
     def __init__(self):
         self.screen = Renderer.pgRenderer(width, height, cameraDist=cameraDist, FogofWar=config.FogofWar, hudHeight=hudHeight)
         
         self._running = True
-        self.keysHeld = []
+        self.keysPressed, self.keysHeld = [], []
         self.rayCaster = RayCaster.Screen(mapTools.map, width = width, height = height - hudHeight, supersampling = config.supersampling, cameraDist = cameraDist, Renderer=self.screen)
         self.loopTime, self.fpsTime, self.fps = 0, 0, 0
         self.player = entities.Player()
+
+        self.spritesOnScreen = []
         self.enemies = [
             entities.Goblin(position = [7.8,3.9]),
             entities.Goblin(position = [7.8,5.1])
         ]
+        
         self.gui = GUI.Hud(self.screen, self.player)
 
         self.soundManager = SoundEngine.SoundManager()
@@ -45,28 +46,25 @@ class Game:
         if event[0] == 'QUIT':
             self._running = False
         elif event[1] == 'press' and not event[0] in self.keysHeld:
+            self.keysPressed.append(event[0])
             self.keysHeld.append(event[0])
         elif event[1] == 'release' and event[0] in self.keysHeld:
             self.keysHeld.remove(event[0])
     
     def loop(self):
         def playerMovement():
-            if 'left' in self.keysHeld:
+            if 'left' in self.keysHeld or 'a' in self.keysHeld:
                 self.player.direction = VectorOps.rotate(self.player.direction, -3.14 * self.deltaTime)
-            elif 'right' in self.keysHeld:
+            elif 'right' in self.keysHeld or 'd' in self.keysHeld:
                 self.player.direction = VectorOps.rotate(self.player.direction, 3.14 * self.deltaTime)
-            if 'up' in self.keysHeld:
+            if 'up' in self.keysHeld or 'w' in self.keysHeld:
                 self.player.move(VectorOps.rotate((0,self.player.maxSpeed * self.deltaTime),VectorOps.angle(self.player.direction)))
                 self.player.walking = 'forward'
-            elif 'down' in self.keysHeld:
+            elif 'down' in self.keysHeld or 's' in self.keysHeld:
                 self.player.move(VectorOps.rotate((0,-self.player.maxSpeed * self.deltaTime * 0.5),VectorOps.angle(self.player.direction)))
                 self.player.walking = 'backward'
             else:
                 self.player.walking = False
-        
-        playerMovement()
-
-    def on_render(self):
         def generateSpriteList():
             sprites = []
             for i in self.enemies:
@@ -85,7 +83,16 @@ class Game:
                     sprites.remove(i)
                     continue
             return sprites
+        
+        playerMovement()
 
+        self.spritesOnScreen = generateSpriteList()
+
+        if 'space' in self.keysPressed:
+            print("attack!")
+            pass #ATTACK FUNCTION HERE
+
+    def on_render(self):
         self.screen.drawBG()
 
         if config.FullScreenSweep:
@@ -95,7 +102,8 @@ class Game:
 
         polygons = self.rayCaster.RenderSweep(rays, sort=True)
 
-        sprites = generateSpriteList()
+        
+        sprites = self.spritesOnScreen[:]
         
         if config.texturedWalls == True:
             self.screen.renderTextured(polygons, sprites)
@@ -132,6 +140,7 @@ class Game:
         
         while( self._running ):
             self.timer()
+            self.keysPressed = []
             for i in self.screen.events():
                 self.on_event(i)
             self.loop()

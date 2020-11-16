@@ -7,7 +7,14 @@ import VectorOps
 
 from mapTools import map
 
+class MobAI:
+    def __init__(self):
+        pass
 
+    def pathing(self, mobs):
+        for i in mobs:
+            pass #for every mob, 1) determine if a target has been seen 2) determine the correct direction to reach the target 3) move the mob towards the target
+            
 class Object:
     def __init__(self, position = [0,0], velocity = [0,0], sprite = "", radius = 0.25, height = 2/3, speed = 1):
         self.position = position

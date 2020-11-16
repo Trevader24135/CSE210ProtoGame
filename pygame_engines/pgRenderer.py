@@ -169,7 +169,8 @@ class pgRenderer:
                 wall.fill([0,0,0,0])
                 blitSprite(polygon)
                 smoothEdges(polygon)
-                self.screen.blit(wall, [polygon[1][0][0], polygon[1][2][1] if polygon[1][2][1] < polygon[1][3][1] else polygon[1][3][1]])
+                coords = [polygon[1][0][0], polygon[1][2][1] if polygon[1][2][1] < polygon[1][3][1] else polygon[1][3][1]]
+                self.screen.blit(wall, coords)
             else:
                 self.render([polygon], [])
         self.drawSprites(sprites)
