@@ -32,11 +32,9 @@ class Game:
         self.player = entities.Player()
 
         self.spritesOnScreen = []
-        self.enemies = [
-            entities.Goblin(position = [7.8,3.9]),
-            entities.Goblin(position = [7.8,5.1])
-        ]
-        
+        self.enemies = []
+        self.enemies.append(entities.Goblin(position = [7.8,3.9], entityList = self.enemies))
+        self.enemies.append(entities.Goblin(position = [7.8,5.1], entityList = self.enemies))
         self.gui = GUI.Hud(self.screen, self.player)
 
         self.soundManager = SoundEngine.SoundManager()
@@ -90,7 +88,13 @@ class Game:
 
         if 'space' in self.keysPressed:
             print("attack!")
-            pass #ATTACK FUNCTION HERE
+
+            if len(self.spritesOnScreen) != 0:
+                print(len(self.spritesOnScreen))
+                print(self.spritesOnScreen[0])
+
+                #self.player.attack(self.spritesOnScreen[0][0])
+                del(self.spritesOnScreen[0][0])
 
     def on_render(self):
         self.screen.drawBG()
