@@ -28,10 +28,11 @@ class Game:
         self._running = True
         self.keysPressed, self.keysHeld = [], []
         self.rayCaster = RayCaster.Screen(mapTools.map, width = width, height = height - hudHeight, supersampling = config.supersampling, cameraDist = cameraDist, Renderer=self.screen)
-        self.loopTime, self.fpsTime, self.fps = 0, 0, 0
+        self.loopTime, self.fpsTime, self.fps, self.deltaTime = 0, 0, 0, 0
         self.player = entities.Player()
 
         self.spritesOnScreen = []
+        self.mobAI = entities.MobAI(mapTools.map) #initialize the AI pather with the map data
         self.enemies = [
             entities.Goblin(position = [7.8,3.9]),
             entities.Goblin(position = [7.8,5.1])
@@ -92,6 +93,17 @@ class Game:
             print("attack!")
             pass #ATTACK FUNCTION HERE
 
+        for enemy in self.enemies: #enemy pathing
+            if -0.4 < enemy.position[0] - self.player.position[0] < 0.4 and -0.4 < enemy.position[1] - self.player.position[1] < 0.4:
+                continue
+            enemy.destination = (self.player.position[0],self.player.position[1])
+            try: #throws an error when the enemy is in the same tile as the target
+                path = self.mobAI.findPath( (enemy.position[0],enemy.position[1]), enemy.destination)
+                sConst = enemy.maxSpeed * self.deltaTime
+                print(enemy.move(VectorOps.multiply(VectorOps.normalize([(path[1][0] - enemy.position[0]), (path[1][1] - enemy.position[1])]),sConst), normalizeResult=False))
+            except:
+                pass
+
     def on_render(self):
         self.screen.drawBG()
 
@@ -101,7 +113,6 @@ class Game:
             rays = self.rayCaster.RaySearch(self.player.position,self.player.direction, simplify=True)
 
         polygons = self.rayCaster.RenderSweep(rays, sort=True)
-
         
         sprites = self.spritesOnScreen[:]
         

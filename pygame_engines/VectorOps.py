@@ -24,6 +24,12 @@ def divide(dividend, divisor):
     else:
         return [j / divisor for j in dividend]
 
+def multiply(factor1, factor2):
+    if type(factor2) == list: 
+        return [j * k for j,k in zip(factor1, factor2)]
+    else:
+        return [j * factor2 for j in factor1]
+
 def swap(vector):
     return [i for i in reversed(vector)]
 
@@ -99,7 +105,5 @@ def pointPerpendicular(point1, point2, magnitude):
     return ([i + rotate((0,magnitude), perp)[j] for j, i in enumerate(point2)],point2,[i - rotate((0,magnitude), perp)[j] for j, i in enumerate(point2)])
 
 if __name__ == "__main__":
-    print(
-        vLerp([-1,1],[1,1],2)[1:3]
-    )
+    print(sub([1,1],[2,2]))
     
