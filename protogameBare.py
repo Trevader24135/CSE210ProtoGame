@@ -90,11 +90,12 @@ class Game:
             print("attack!")
 
             if len(self.spritesOnScreen) != 0:
-                print(len(self.spritesOnScreen))
-                print(self.spritesOnScreen[0])
+                #print(len(self.spritesOnScreen))
+                #print(self.spritesOnScreen[0])
 
                 #self.player.attack(self.spritesOnScreen[0][0])
-                del(self.spritesOnScreen[0][0])
+                self.enemies.remove(self.spritesOnScreen[0][0])
+                #self.spritesOnScreen = generateSpriteList()
 
     def on_render(self):
         self.screen.drawBG()
