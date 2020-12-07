@@ -125,14 +125,29 @@ class Object:
         self.position = [i + direction[j] for j,i in enumerate(self.position)]
         return direction
 
-class Character(Object):# vv                            Object Info                                         vv  vv                     Character Stats                     vv
-    def __init__(self, position = [0,0], velocity = [0,0], sprite = "", radius = 0.25, height = 2/3, speed = 1, health = 100, defense = 10, attackDamage = 0, reach = 0.75,  ):
+class Character(Object):# vv                                  Object Info                                               vv  vv                     Character Stats                     vv
+    def __init__(self, position = [0,0], velocity = [0,0], sprite = "", radius = 0.25, height = 2/3, speed = 1, entityList = None, health = 100, currentHealth = 100, defense = 10, attackDamage = 100, reach = 0.75):
         super().__init__(position = position, velocity = velocity, sprite = sprite, radius = radius, height = height, speed = speed)
         self.destination = [1,1]
+        self.health = health
+        self.defense = defense
+        self.attackDamage = attackDamage
+        self.reach = reach
+        self.currentHealth = currentHealth
 
     def attack(self, target):
-        pass
+        target.damage(self.attackDamage)
 
+    def damage(self, damage):
+
+        if(self.defense < damage):
+            self.currentHealth -= damage - self.defense
+
+        print(self.currentHealth)
+
+        if(self.currentHealth <= 0):
+            print("Death!!!")
+            self.entityList.remove(self)
 
 ## Specific Entity Types ##
 
@@ -142,10 +157,8 @@ class Player(Character):
         self.direction = VectorOps.normalize((-1,0))
         self.walking = False
 
-class Goblin(Character):
-    def __init__(self, position = [3.5, 3.5]):
-        super().__init__(position = position, sprite = Renderer.goblinSprite, height = 1/2, speed=0.25)
+        
 
-if __name__ == "__main__":
-    testmobai = MobAI(map)
-    print(testmobai.findPath([1,1],[10,1]))
+class Goblin(Character):
+    def __init__(self, position = [3.5, 3.5], entityList = None):
+        super().__init__(position = position, sprite = Renderer.goblinSprite, height = 1/2, entityList = entityList)

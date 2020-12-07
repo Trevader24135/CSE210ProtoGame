@@ -91,7 +91,14 @@ class Game:
 
         if 'space' in self.keysPressed:
             print("attack!")
-            pass #ATTACK FUNCTION HERE
+
+            if len(self.spritesOnScreen) != 0:
+                #print(len(self.spritesOnScreen))
+                #print(self.spritesOnScreen[0])
+
+                #self.player.attack(self.spritesOnScreen[0][0])
+                self.enemies.remove(self.spritesOnScreen[0][0])
+                #self.spritesOnScreen = generateSpriteList()
 
         for enemy in self.enemies: #enemy pathing
             if -0.4 < enemy.position[0] - self.player.position[0] < 0.4 and -0.4 < enemy.position[1] - self.player.position[1] < 0.4:
