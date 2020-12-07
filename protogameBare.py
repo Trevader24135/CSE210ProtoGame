@@ -29,14 +29,16 @@ class Game:
         self.keysPressed, self.keysHeld = [], []
         self.rayCaster = RayCaster.Screen(mapTools.map, width = width, height = height - hudHeight, supersampling = config.supersampling, cameraDist = cameraDist, Renderer=self.screen)
         self.loopTime, self.fpsTime, self.fps, self.deltaTime = 0, 0, 0, 0
-        self.player = entities.Player()
+        self.player = entities.Player(position = [2.5,5.5])
 
         self.spritesOnScreen = []
         self.mobAI = entities.MobAI(mapTools.map) #initialize the AI pather with the map data
         self.enemies = [
-            entities.Goblin(position = [7.8,3.9]),
-            entities.Goblin(position = [7.8,5.1])
+            entities.Goblin(position = [8.5,1.5]),
+            entities.Goblin(position = [7,2.3])
         ]
+        for i in self.enemies:
+            i.entityList = self.enemies
         
         self.gui = GUI.Hud(self.screen, self.player)
 
@@ -84,14 +86,16 @@ class Game:
                     sprites.remove(i)
                     continue
             return sprites
+        def checkwin():
+            if mapTools.map[int(self.player.position[0])][int(self.player.position[1])] == 1:
+                print("you win!")
         
         playerMovement()
-
+        checkwin()
         self.spritesOnScreen = generateSpriteList()
 
         if 'space' in self.keysPressed:
-            print("attack!")
-
+            #print("attack!")
             if len(self.spritesOnScreen) != 0:
                 #print(len(self.spritesOnScreen))
                 #print(self.spritesOnScreen[0])
@@ -107,9 +111,10 @@ class Game:
             try: #throws an error when the enemy is in the same tile as the target
                 path = self.mobAI.findPath( (enemy.position[0],enemy.position[1]), enemy.destination)
                 sConst = enemy.maxSpeed * self.deltaTime
-                print(enemy.move(VectorOps.multiply(VectorOps.normalize([(path[1][0] - enemy.position[0]), (path[1][1] - enemy.position[1])]),sConst), normalizeResult=False))
+                enemy.move(VectorOps.multiply(VectorOps.normalize([(path[1][0] - enemy.position[0]), (path[1][1] - enemy.position[1])]),sConst), normalizeResult=False)
             except:
                 pass
+        
 
     def on_render(self):
         self.screen.drawBG()

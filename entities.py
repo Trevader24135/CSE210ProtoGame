@@ -6,7 +6,6 @@ import VectorOps
 
 #used for pathfinding/movement
 from mapTools import map
-import numpy as np
 import heapq
 
 class MobAI:
@@ -33,7 +32,7 @@ class MobAI:
         goal = (int(goal[0] * self.pathingSubSampling), int(goal[1] * self.pathingSubSampling))
 
         def heuristic(a, b):
-            return np.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2) #straight line score from current to goal
+            return ((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2)**(1/2) #straight line score from current to goal
 
         neighbors = [(0,1),(0,-1),(1,0),(-1,0),(1,1),(1,-1),(-1,1),(-1,-1)] #possible tile movements, one for each direction
         close_set = set() #initialize close set
@@ -134,6 +133,7 @@ class Character(Object):# vv                                  Object Info       
         self.attackDamage = attackDamage
         self.reach = reach
         self.currentHealth = currentHealth
+        self.entityList = entityList
 
     def attack(self, target):
         target.damage(self.attackDamage)
@@ -152,13 +152,11 @@ class Character(Object):# vv                                  Object Info       
 ## Specific Entity Types ##
 
 class Player(Character):
-    def __init__(self):
-        super().__init__(position = [3.5,3.5])
+    def __init__(self, position):
+        super().__init__(position)
         self.direction = VectorOps.normalize((-1,0))
         self.walking = False
 
-        
-
 class Goblin(Character):
     def __init__(self, position = [3.5, 3.5], entityList = None):
-        super().__init__(position = position, sprite = Renderer.goblinSprite, height = 1/2, entityList = entityList)
+        super().__init__(position = position, sprite = Renderer.goblinSprite, height = 1/2, entityList = entityList, speed=0.3)

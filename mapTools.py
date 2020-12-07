@@ -8,7 +8,7 @@ gwchr = [[110,109,109],[110,109,109],[110,109,109],[110,109,109]]
 rb = [[255,0,0],[0,255,0],[255,255,255],[0,0,255]]
 gray = [[122,122,122],[122,122,122],[122,122,122],[122,122,122]]
 
-map = [
+testmap = [
     [gw, gw, gw, gw, gw, gw, gw],
     [gw, 0, gw, 0, 0, 0, gw], 
     [gw, 0, 0, 0, 0, 0, gw], 
@@ -23,6 +23,19 @@ map = [
     [gw, 0, 0, 0, 0, 0, gw], 
     [gw, gw, gw, gw, gw, gw, gw]]
 
+map = [
+    [gw, gw, gw, gw, gw, gw, gw, gw, gw, gw, gw],
+    [gw, 0 , 0 , gw, 0 , 0 , 0 , gw, 0 , 0 , gw],
+    [gw, 0 , 0 , gw, 0 , 0 , 0 , gw, 0 , 0 , gw],
+    [gw, 0 , 0 , gw, 0 , 0 , 0 , gw, gw, 0 , gw],
+    [gw, gw, 0 , gw, gw, 0 , gw, gw, gw, 0 , gw],
+    [gw, gw, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , gw],
+    [gw, gw, gw, gw, gw, 0 , gw, gw, 0 , gw, gw],
+    [gw, 0 , 0 , 0 , gw, 0 , gw, 0 , 0 , 0 , gw],
+    [gw, 0 , 0 , 0 , 0 , 0 , gw, 0 , gw, gw, gw],
+    [gw, 0 , 0 , 0 , gw, gw, gw, 0 , 0 , 1 , gw],
+    [gw, gw, gw, gw, gw, gw, gw, gw, gw, gw, gw]
+]
 directions = {
     'S':0,
     'W':1,
