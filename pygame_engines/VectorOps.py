@@ -22,7 +22,7 @@ def divide(dividend, divisor):
     if type(divisor) == list: 
         return [j / k for j,k in zip(dividend, divisor)]
     else:
-        return [j / divisor for j in dividend]
+        return [j / divisor if divisor != 0 else 999 for j in dividend]
 
 def multiply(factor1, factor2):
     if type(factor2) == list: 

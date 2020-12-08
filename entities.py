@@ -10,7 +10,9 @@ import heapq
 
 class MobAI:
     def __init__(self, mapdata):
-        self.pathingSubSampling = 2
+        self.pathingSubSampling = 3
+        self.mapoffset = 2
+        self.pathoffset = 1
         mapEnlargened = []
         for y in mapdata:
             row = []
@@ -23,13 +25,18 @@ class MobAI:
                         row.append(1)
             for i in range(self.pathingSubSampling):
                 mapEnlargened.append(row)
+        #for i in mapEnlargened:
+        #    print(i)
+        #print()
         self.map = mapEnlargened
-        for i in self.map:
-            print(i)
+        self.map = [[1 for i in range(self.mapoffset)] + n for n in self.map]
+        self.map = [[1 for i in range(len(self.map[0]))] for i in range(self.mapoffset)] + self.map
+        #for i in self.map:
+        #    print(i)
     
     def findPath(self, start, goal):
         start = (int(start[0] * self.pathingSubSampling), int(start[1] * self.pathingSubSampling))
-        goal = (int(goal[0] * self.pathingSubSampling), int(goal[1] * self.pathingSubSampling))
+        goal = (int(goal[0] * self.pathingSubSampling) + self.pathoffset, int(goal[1] * self.pathingSubSampling) + self.pathoffset)
 
         def heuristic(a, b):
             return ((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2)**(1/2) #straight line score from current to goal
@@ -84,7 +91,7 @@ class Object:
         self.height = height #height is in terms of walls
         self.maxSpeed = speed
 
-    def move(self, direction, collideWithEntities=False, normalizeResult=False):#direction is a vector with a direction(angle) and magnitude(speed)
+    def move(self, direction, collideWithEntities=False, normalizeResult=False, smoothCollision=False):#direction is a vector with a direction(angle) and magnitude(speed)
         def mapRel(direction):
             return map[int(self.position[0] + direction[0])][int(self.position[1] + direction[1])]
         magnitude = VectorOps.length(direction)
@@ -111,10 +118,23 @@ class Object:
                         direction[1] = 0
 
             return direction
+        def checkCollisionSmooth(direction):
+            if direction[0] > 0 and type(mapRel((1,0))) != int and VectorOps.fpart(self.position[0]) > 1 - self.radius:
+                direction[0] = 0
+            elif direction[0] < 0 and type(mapRel((-1,0))) != int and VectorOps.fpart(self.position[0]) < self.radius:
+                direction[0] = 0
+            if direction[1] > 0 and type(mapRel((0,1))) != int and VectorOps.fpart(self.position[1]) > 1 - self.radius:
+                direction[1] = 0
+            elif direction[1] < 0 and type(mapRel((0,-1))) != int and VectorOps.fpart(self.position[1]) < self.radius:
+                direction[1] = 0
+            return direction
         def checkEntities(direction):
             return direction
 
-        direction = checkCollision(direction)
+        if smoothCollision:
+            direction = checkCollisionSmooth(direction)
+        else:
+            direction = checkCollision(direction)
         if normalizeResult:
             direction = VectorOps.multiply(VectorOps.normalize(direction), magnitude)
 
@@ -151,9 +171,9 @@ class Character(Object):# vv                                      Object Info   
 ## Specific Entity Types ##
 
 class Player(Character):
-    def __init__(self, position):
+    def __init__(self, position, direction=(-1,0)):
         super().__init__(position)
-        self.direction = VectorOps.normalize((-1,0))
+        self.direction = VectorOps.normalize(direction)
         self.walking = False
 
 class Goblin(Character):

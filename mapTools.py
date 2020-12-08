@@ -24,17 +24,21 @@ testmap = [
     [gw, gw, gw, gw, gw, gw, gw]]
 
 map = [
-    [gw, gw, gw, gw, gw, gw, gw, gw, gw, gw, gw],
-    [gw, 0 , 0 , gw, 0 , 0 , 0 , gw, 0 , 0 , gw],
-    [gw, 0 , 0 , gw, 0 , 0 , 0 , gw, 0 , 0 , gw],
-    [gw, 0 , 0 , gw, 0 , 0 , 0 , gw, gw, 0 , gw],
-    [gw, gw, 0 , gw, gw, 0 , gw, gw, gw, 0 , gw],
-    [gw, gw, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , gw],
-    [gw, gw, gw, gw, gw, 0 , gw, gw, 0 , gw, gw],
-    [gw, 0 , 0 , 0 , gw, 0 , gw, 0 , 0 , 0 , gw],
-    [gw, 0 , 0 , 0 , 0 , 0 , gw, 0 , gw, gw, gw],
-    [gw, 0 , 0 , 0 , gw, gw, gw, 0 , 0 , 1 , gw],
-    [gw, gw, gw, gw, gw, gw, gw, gw, gw, gw, gw]
+   #0  1   2   3   4   5   6   7   8   9   10
+    [gw, gw, gw, gw, gw, gw, gw, gw, gw, gw, gw], #0
+    [gw, 0 , 0 , gw, 0 , 0 , 0 , gw, 0 , 0 , gw], #1
+    [gw, 0 , 0 , gw, 0 , 0 , 0 , gw, 0 , 0 , gw], #2
+    [gw, 0 , 0 , gw, 0 , 0 , 0 , gw, gw, 0 , gw], #3
+    [gw, gw, 0 , gw, gw, 0 , gw, gw, gw, 0 , gw], #4
+    [gw, gw, 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , gw], #5
+    [gw, gw, gw, gw, gw, 0 , gw, gw, 0 , gw, gw], #6
+    [gw, 0 , 0 , 0 , gw, 0 , gw, 0 , 0 , 0 , gw], #7
+    [gw, 0 , 0 , 0 , 0 , 0 , gw, 0 , gw, gw, gw], #8
+    [gw, 0 , 0 , 0 , gw, gw, gw, 0 , 0 , 0 , gw], #9
+    [gw, gw, 0 , gw, gw, 1 , gw, gw, 0 , gw, gw], #10
+    [gw, gw, 0 , gw, 0 , 0 , 0 , gw, 0 , 0 , gw], #11
+    [gw, gw, 0 , 0 , 0 , 0 , 0 , gw, 0 , 0 , gw], #12
+    [gw, gw, gw, gw, gw, gw, gw, gw, gw, gw, gw], #13
 ]
 directions = {
     'S':0,
