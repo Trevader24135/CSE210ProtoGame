@@ -106,12 +106,8 @@ class Game:
         if 'space' in self.keysPressed:
             #print("attack!")
             if len(self.spritesOnScreen) != 0:
-                #print(len(self.spritesOnScreen))
-                #print(self.spritesOnScreen[0])
 
-                #self.player.attack(self.spritesOnScreen[0][0])
-                self.enemies.remove(self.spritesOnScreen[0][0])
-                #self.spritesOnScreen = generateSpriteList()
+                self.player.attack(self.spritesOnScreen[0][0])
 
         for enemy in self.enemies: #enemy pathing
             if self.rayCaster.TestLoS(self.player.position, enemy.position):
