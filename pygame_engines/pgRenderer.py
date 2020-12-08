@@ -71,11 +71,11 @@ class pgRenderer:
     def FogofWarColor(self, distance):
         return (255 * (self.FogofWar + 1)**(1/2)) / ( ((self.FogofWar + 1)**(1/2) - 1) * (distance + 1)**(1/2) ) - (255 / ((self.FogofWar + 1)**(1/2) - 1) )
 
-    def drawSprite(self, sprite, corners, distance):
+    def drawSprite(self, sprite, corners, distance, colorMultiplier):
         image = pygame.transform.scale(sprite, (corners[2], corners[3])).convert_alpha()
         #color = [int(255 / distance) if 255 / distance > 0 and distance > 1 else 255 if distance <= 1 else 0 for n in [0,1,2]]
         color = self.FogofWarColor(distance)
-        color = [int(color) if color > 0 else 0 for n in [0,1,2]]
+        color = [int(color * n) if color > 0 and color * n < 255 else 255 if color > 0 else 0 for n in colorMultiplier]
         image.fill(color, special_flags=pygame.BLEND_RGB_MULT)
         
         self.screen.blit(image, (corners[0], corners[1] ))
@@ -94,7 +94,7 @@ class pgRenderer:
                 if config.debugLevel >= 1:
                     self.debugSprites(spriteCorners)
                 
-                self.drawSprite(sprite[0].sprite, spriteCorners, sprite[1])
+                self.drawSprite(sprite[0].sprite, spriteCorners, sprite[1], sprite[0].colorMultiplier)
         return sprites
 
     def render(self, polygons, sprites):

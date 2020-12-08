@@ -103,10 +103,8 @@ class Game:
         checkwin()
         self.spritesOnScreen = generateSpriteList()
 
-        if 'space' in self.keysPressed:
-            #print("attack!")
-            if len(self.spritesOnScreen) != 0:
-
+        if 'space' in self.keysPressed and len(self.spritesOnScreen) != 0:
+            if self.loopTime - self.player.attackCoolDown > self.player.attackTime:
                 self.player.attack(self.spritesOnScreen[0][0])
 
         for enemy in self.enemies: #enemy pathing
@@ -131,6 +129,9 @@ class Game:
 
         polygons = self.rayCaster.RenderSweep(rays, sort=True)
         
+        for enemy in self.enemies: #reset enemy color overlays
+            if enemy.colorAniTime - self.loopTime < 0:
+                enemy.colorMultiplier = [1,1,1]
         sprites = self.spritesOnScreen[:]
         
         if config.texturedWalls == True:
@@ -169,8 +170,8 @@ class Game:
         while( self._running ):
             self.timer()
             self.keysPressed = []
-            for i in self.screen.events():
-                self.on_event(i)
+            for event in self.screen.events():
+                self.on_event(event)
             self.loop()
             self.on_render()
             self.manageSounds()

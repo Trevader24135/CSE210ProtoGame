@@ -1,5 +1,6 @@
 import sys
 sys.path.append('pygame_engines')
+import time
 
 import pgRenderer as Renderer
 import VectorOps
@@ -90,6 +91,8 @@ class Object:
         self.sprite = sprite
         self.height = height #height is in terms of walls
         self.maxSpeed = speed
+        self.colorMultiplier = [1,1,1]
+        self.colorAniTime = 0
 
     def move(self, direction, collideWithEntities=False, normalizeResult=False, smoothCollision=False):#direction is a vector with a direction(angle) and magnitude(speed)
         def mapRel(direction):
@@ -154,11 +157,16 @@ class Character(Object):# vv                                  Object Info       
         self.reach = reach
         self.currentHealth = currentHealth
         self.entityList = entityList
+        self.attackCoolDown = 0.4 #attack cool down duration in seconds
+        self.attackTime = 0 #time of last attack
 
     def attack(self, target):
+        self.attackTime = time.perf_counter()
         target.damage(self.attackDamage)
 
     def damage(self, damage):
+        self.colorMultiplier = [255, 0.5, 0.5]
+        self.colorAniTime = time.perf_counter() + 0.150
 
         if(self.defense < damage):
             self.currentHealth -= damage - self.defense
