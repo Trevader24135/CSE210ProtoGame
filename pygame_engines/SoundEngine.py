@@ -41,7 +41,7 @@ class SoundManager:
         self.enemyHitting = False
 
         if ambience:
-            Sounds(ambientSound, volume=0.075 * config.volume).play(-1)
+            Sounds(ambientSound, volume=0.09 * config.volume).play(-1)
 
         self.randomSounds = randomSounds 
 
@@ -69,7 +69,7 @@ class SoundManager:
     def playSounds(self):
         Time = time.perf_counter()
         if self.walking and Time - self.walkTime > self.walkDelay:
-            Sounds(footstep[self.foot], volume=0.3 * config.volume).play()
+            Sounds(footstep[self.foot], volume=0.4 * config.volume).play()
             self.foot = 0 if self.foot == 1 else 1
             self.walkTime = Time
 

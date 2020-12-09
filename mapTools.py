@@ -40,8 +40,17 @@ map = [
     [gw, gw, 0 , gw, gw, ex, gw, gw, 0 , gw, gw], #10
     [gw, 0 , 0 , gw,tcs, 1 ,tcs, gw, 0 , 0 , ch], #11
     [gw, 0 , 0 , gw, 0 , 0 , 0 , gw, 0 , 0 , ch], #12
-    [gw, gw, 0 , 0 , 0 , 0 , 0 , gw, 0 , 0 , ch], #13
-    [gw, gw, gw, gw, gw, gw ,gw, gw, gw, gw, gw] #14
+    [gw, 0 , gw, gw, 0 , 0 , 0 , gw, 0 , 0 , ch], #13
+    [gw, 0 , 0 , gw, 0 , gw, gw, gw, gw, gw, gw], #14
+    [gw, 0 , 0 , gw, 0 , gw, 0 , 0 , gw, 0 , gw], #15
+    [gw, 0 , 0 , gw, 0 , 0  ,0 , 0 , 0 , 0 , gw], #16
+    [gw, 0 , gw, gw, gw, gw ,0 , 0 , gw, 0 , gw], #17
+    [gw, 0 , 0 , 0 , 0 , 0  ,0 , 0 , gw, 0 , gw], #18
+    [gw, gw, gw, gw, gw, gw ,0 , 0 , gw, 0 , gw], #19
+    [ch, 0 , 0 , 0 , gw, gw ,0 , 0 , gw, gw, gw], #20
+    [ch, 0 , 0 , 0 , 0 , 0  ,0 , 0 , gw, gw, gw], #21
+    [gw, ch, ch, gw, gw, gw ,ch, ch, gw, gw, gw] #22
+   #0  1   2   3   4   5   6   7   8   9   10
 ]
 
 lightMap = [[0 if type(k) == int else k[4] if k[4] != 0 else -1 for k in j] for j in map]
