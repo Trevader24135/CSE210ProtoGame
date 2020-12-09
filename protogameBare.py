@@ -38,7 +38,8 @@ class Game:
         self.mobAI = entities.MobAI(mapTools.map) #initialize the AI pather with the map data
         self.enemies = [
             entities.Goblin(position = [2.8,1.4]),      #organized by rooms
-            entities.ArmoredGoblin(position = [2,2]),   #Top Left Room
+            entities.ArmoredGoblin(position = [2,2]),
+            entities.FastGoblin(position = [2,2]), 
 
             entities.Goblin(position = [2,8.4]),    #Top Right Room
 
