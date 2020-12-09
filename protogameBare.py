@@ -36,7 +36,8 @@ class Game:
         self.spritesOnScreen = []
         self.mobAI = entities.MobAI(mapTools.map) #initialize the AI pather with the map data
         self.enemies = [
-            entities.Goblin(position = [2.8,1.4]), 
+            entities.Goblin(position = [2.8,1.4]),
+            entities.ArmoredGoblin(position = [2.8,1.4]), 
 
             entities.Goblin(position = [2,8.4]),
 
