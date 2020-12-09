@@ -61,6 +61,7 @@ class Game:
 
         self.soundManager = SoundEngine.SoundManager()
         self.player.walking = False
+        self.enemyAttacking = False
         self.music = SoundEngine.Music(song=SoundEngine.mainTheme)
         
     def on_event(self, event):
@@ -142,19 +143,21 @@ class Game:
                     enemy.move(VectorOps.multiply(VectorOps.normalize([(path[1][0] - enemy.position[0]), (path[1][1] - enemy.position[1])]),sConst), normalizeResult=False, smoothCollision = True)
                 except:
                     pass
-
+        
+        self.enemyAttacking = False
         for enemy in self.enemies: #enemy attacking
             if self.rayCaster.TestLoS(self.player.position, enemy.position):
-                if -1 < enemy.position[0] - self.player.position[0] < 1 and -1 < enemy.position[1] - self.player.position[1] < 1:
+                if -0.6 < enemy.position[0] - self.player.position[0] < 0.6 and -0.6 < enemy.position[1] - self.player.position[1] < 0.6:
                     if self.loopTime - enemy.attackCoolDown > enemy.attackTime:
                         damage = enemy.attack(self.player,0)
-
+                        self.enemyAttacking = True
                         if(damage == -1):
-                            pass #End The Game
+                            self._running = False
                         else:
                             #it might be better to have the sword or GUI flash red and have a health bar
                             self.screen.addConsoleMessage("you recieved {damage} damage!".format(damage = damage))
                             self.screen.addConsoleMessage("you are at {health} health!".format(health = self.player.currentHealth))
+
     def on_render(self):
         self.screen.drawBG()
 
@@ -175,16 +178,23 @@ class Game:
         else:
             self.screen.render(polygons, sprites)
 
-        self.screen.drawWeapon()
-        self.gui.drawHud()
 
         if config.debugLevel >= 1:
             self.screen.debugFPS(self.fps)
             if config.debugLevel >= 2:
                 self.screen.debugCompass(int(VectorOps.angle(VectorOps.rotate(self.player.direction, math.pi/2)) * 180 / math.pi))
         
-        if self.gameWon:
+        self.screen.drawWeapon()
+
+        if self._running == False and self.gameWon:
             self.screen.displayGameWin()
+            self.screen.addConsoleMessage("you've won! press Esc to quit")
+        elif self._running == False and self.gameWon == False:
+            self.screen.displayDeath()
+            self.screen.addConsoleMessage("you've Died! press Esc to quit")
+
+        self.gui.drawHud()
+
         self.screen.update()
 
     def manageSounds(self):
@@ -203,6 +213,11 @@ class Game:
         else:
             self.soundManager.attackHitSound(False)
 
+        if self.enemyAttacking:
+            self.soundManager.enemyAttackHitSound(True)
+        else:
+            self.soundManager.enemyAttackHitSound(False)
+
         self.soundManager.playSounds()
 
     def timer(self):
@@ -215,16 +230,16 @@ class Game:
             self.fpsTime = 0
 
     def on_execute(self):
-        self.screen.TitleScreen()
+        self.screen.titleScreen()
         self.music.play()
         while(not 'return' in self.keysHeld and not 'space' in self.keysHeld):
             self.keysPressed = []
             for event in self.screen.events():
                 self.on_event(event)
 
-        self.screen.TitleScreenAniTime = time.perf_counter()
+        self.screen.titleScreenAniTime = time.perf_counter()
         self.timer()
-        while self.screen.TitleScreenFadeOut(self.deltaTime):
+        while self.screen.titleScreenFadeOut(self.deltaTime):
             self.timer()
             self.music.fadeOut(self.deltaTime, 3)
         self.music.pause()
