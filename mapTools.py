@@ -41,7 +41,7 @@ map = [
     [gw, 0 , 0 , gw,tcs, 1 ,tcs, gw, 0 , 0 , ch], #11
     [gw, 0 , 0 , gw, 0 , 0 , 0 , gw, 0 , 0 , ch], #12
     [gw, 0 , gw, gw, 0 , 0 , 0 , gw, 0 , 0 , ch], #13
-    [gw, 0 , 0 , gw, 0 , gw, gw, gw, gw, gw, gw], #14
+    [gw, 0 , 0 , gw, 0 , gw, gw, gw, gw, 0 , gw], #14
     [gw, 0 , 0 , gw, 0 , gw, 0 , 0 , gw, 0 , gw], #15
     [gw, 0 , 0 , gw, 0 , 0  ,0 , 0 , 0 , 0 , gw], #16
     [gw, 0 , gw, gw, gw, gw ,0 , 0 , gw, 0 , gw], #17
