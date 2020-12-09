@@ -147,8 +147,8 @@ class Object:
         self.position = [i + direction[j] for j,i in enumerate(self.position)]
         return direction
 
-class Character(Object):# vv                                      Object Info                                                   vv  vv                     Character Stats                     vv
-    def __init__(self, position = [0,0], velocity = [0,0], sprite = "", radius = 0.25, height = 2/3, speed = 1, entityList = None, health = 100, currentHealth = 100, defense = 10, attackDamage = 100, reach = 0.75):
+class Character(Object):# vv                                      Object Info                                                   vv  vv                                                 Character Stats                                                 vv
+    def __init__(self, position = [0,0], velocity = [0,0], sprite = "", radius = 0.25, height = 2/3, speed = 1, entityList = None, health = 100, currentHealth = 100, defense = 10, attackDamage = 100, reach = 1, attackCoolDown = 0.4, isPlayer = False):
         super().__init__(position = position, velocity = velocity, sprite = sprite, radius = radius, height = height, speed = speed)
         self.destination = [1,1]
         self.health = health
@@ -157,13 +157,16 @@ class Character(Object):# vv                                      Object Info   
         self.reach = reach
         self.currentHealth = currentHealth
         self.entityList = entityList
-        self.attackCoolDown = 0.4 #attack cool down duration in seconds
+        self.attackCoolDown = attackCoolDown #attack cool down duration in seconds
         self.attackTime = 0 #time of last attack
+        self.isPlayer = isPlayer
 
-    def attack(self, target):
-        self.attackTime = time.perf_counter()
-        damageDealt = target.damage(self.attackDamage)
-        return damageDealt
+    def attack(self, target, distance):
+        if(self.reach >= distance):
+            self.attackTime = time.perf_counter()
+            damageDealt = target.damage(self.attackDamage)
+            return damageDealt
+        return 0
 
     def damage(self, damage):
         self.colorMultiplier = [255, 0.5, 0.5]
@@ -173,6 +176,8 @@ class Character(Object):# vv                                      Object Info   
             self.currentHealth -= damage - self.defense
 
         if(self.currentHealth <= 0):
+            if(self.isPlayer == True):
+                return -1
             self.entityList.remove(self)
         
         return damage - self.defense
@@ -181,7 +186,7 @@ class Character(Object):# vv                                      Object Info   
 
 class Player(Character):
     def __init__(self, position, direction=(-1,0)):
-        super().__init__(position)
+        super().__init__(position, isPlayer=True)
         self.direction = VectorOps.normalize(direction)
         self.walking = False
         self.attacking = False
@@ -189,4 +194,4 @@ class Player(Character):
 
 class Goblin(Character):
     def __init__(self, position = [3.5, 3.5], entityList = None):
-        super().__init__(position = position, sprite = Renderer.goblinSprite, height = 1/2, entityList = entityList, speed=0.3)
+        super().__init__(position = position, sprite = Renderer.goblinSprite, height = 1/2, entityList = entityList, speed = 0.3, attackDamage = 20, attackCoolDown = 1)
