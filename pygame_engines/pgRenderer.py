@@ -24,7 +24,8 @@ if config.texturedWalls:
         "000":pygame.image.load("assets\\Walls\\black.png"),
         "255255255":pygame.image.load("assets\\Walls\\white.png"),
         "109109109":pygame.image.load("assets\\Walls\\Wall32T.png"),
-        "110109109":pygame.image.load("assets\\Walls\\Wall32TRustedChains.png")
+        "110109109":pygame.image.load("assets\\Walls\\Wall32TRustedChains.png"),
+        "110110110":pygame.image.load("assets\\Walls\\Wall32TExit.png")
     }
 
 goblinSprite = pygame.image.load("assets\\Mobs\\goblin.png")
@@ -43,7 +44,7 @@ class pgRenderer:
         
         self.hud = pygame.image.load("assets\\HUD\\hud.png")
         self.hud = pygame.transform.scale(self.hud, (self.width, self.hudHeight))
-
+        self.winMsg = pygame.image.load("assets\\HUD\\winMsg.png")
         self.deltaTime, self.lastTime = 0, time.perf_counter()
         self.weapon = swordSprite
         self.weaponAniTime = 0
@@ -134,8 +135,8 @@ class pgRenderer:
             return heightOne * ((wall.get_width() - px) / width) + heightTwo * ((px) / width)
         def darkenSprite(polygon):
             #color = [int(255 / (0.5 + polygon[0])) if 0 < (255 / (0.5 + polygon[0])) < 255 else 0 if (255 / (0.5 + polygon[0])) < 0 else 255 for n in [0,1,2]]
-            color = self.FogofWarColor(polygon[0])
-            color = [int(color)  if color > 0 else 0 for n in [0,1,2]]
+            color = self.FogofWarColor(polygon[0]) + lightValue
+            color = [int(color) if 255 > color > 0 else 255 if color > 255 else 0 for n in [0,1,2]]
             sprite.fill(color, special_flags=pygame.BLEND_RGB_MULT)
         def getDimmensions(polygon):
             return (polygon[1][1][0] - polygon[1][0][0]),(polygon[1][0][1] - polygon[1][3][1]),(polygon[1][1][1] - polygon[1][2][1])
@@ -164,7 +165,8 @@ class pgRenderer:
             if polygon[0] < self.FogofWar:
                 
                 color = mapTools.map[polygon[2][0]][polygon[2][1]][mapTools.directions[polygon[3]]]
-                
+                lightValue = mapTools.lightMap[polygon[2][0] + (1 if polygon[3] == 'N' else -1 if polygon[3] == 'S' else 0)][polygon[2][1] + (1 if polygon[3] == 'W' else -1 if polygon[3] == 'E' else 0)]
+
                 sprite = getTexture(polygon)
 
                 if not (0.95 < VectorOps.distance(polygon[4][0],polygon[4][1]) < 1.05):
@@ -195,7 +197,6 @@ class pgRenderer:
     def events(self):
         keys = []
         for event in pygame.event.get():
-            
             if event.type == pygame.QUIT:
                 keys.append(['QUIT','QUIT'])
             elif event.type == pygame.KEYDOWN:
@@ -221,15 +222,18 @@ class pgRenderer:
         self.lastTime = time.perf_counter()
 
         if time.perf_counter() - self.weaponAniTime > 0.4:
-            weaponPos = self.weaponPos
+            self.weaponPos = [300,150]
             self.weaponAngle = -30
             self.weapon = pygame.transform.rotate(swordSprite, self.weaponAngle)
-            print(self.deltaTime)
+            
         else:
-            weaponPos = [self.weaponPos[0] + 2, self.weaponPos[1] + 2]
+            self.weaponPos = [self.weaponPos[0] + 1 * self.deltaTime, self.weaponPos[1] + 450 * self.deltaTime]
             self.weaponAngle += 360 * self.deltaTime
             self.weapon = pygame.transform.rotate(swordSprite, self.weaponAngle)
-        self.screen.blit(self.weapon, weaponPos)
+        self.screen.blit(self.weapon, self.weaponPos)
     
     def startAttack(self):
         self.weaponAniTime = time.perf_counter()
+    
+    def displayGameWin(self):
+        self.screen.blit(self.winMsg, ((self.width - self.winMsg.get_width()) / 2, (self.height - self.winMsg.get_height()) / 2))

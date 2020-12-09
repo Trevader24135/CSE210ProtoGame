@@ -27,6 +27,7 @@ class Game:
         self.screen = Renderer.pgRenderer(width, height, cameraDist=cameraDist, FogofWar=config.FogofWar, hudHeight=hudHeight)
         
         self._running = True
+        self.gameWon = False
         self.keysPressed, self.keysHeld = [], []
         self.rayCaster = RayCaster.Screen(mapTools.map, width = width, height = height - hudHeight, supersampling = config.supersampling, cameraDist = cameraDist, Renderer=self.screen)
         
@@ -45,7 +46,10 @@ class Game:
             entities.Goblin(position = [7.7,2.3]),
             entities.Goblin(position = [9,3.1]),
 
-            entities.Goblin(position = [12,5.5])
+            entities.Goblin(position = [12,5.5]),
+
+            entities.Goblin(position = [11.5,9.5]),
+            entities.Goblin(position = [13,9]),
         ]
         for i in self.enemies:
             i.entityList = self.enemies
@@ -54,6 +58,7 @@ class Game:
 
         self.soundManager = SoundEngine.SoundManager()
         self.player.walking = False
+        
         
     def on_event(self, event):
         if event[0] == 'QUIT':
@@ -99,6 +104,8 @@ class Game:
         def checkwin():
             if mapTools.map[int(self.player.position[0])][int(self.player.position[1])] == 1:
                 print("you win!")
+                self.gameWon = True
+                self._running = False
         
         playerMovement()
         checkwin()
@@ -157,7 +164,9 @@ class Game:
             self.screen.debugFPS(self.fps)
             if config.debugLevel >= 2:
                 self.screen.debugCompass(int(VectorOps.angle(VectorOps.rotate(self.player.direction, math.pi/2)) * 180 / math.pi))
-                
+        
+        if self.gameWon:
+            self.screen.displayGameWin()
         self.screen.update()
 
     def manageSounds(self):
@@ -197,6 +206,11 @@ class Game:
             self.loop()
             self.on_render()
             self.manageSounds()
+        
+        self._running = True
+        while( self._running ):
+            for event in self.screen.events():
+                self.on_event(event)
 
 def mainLaunch(renderer = ''):
     controller = Game()

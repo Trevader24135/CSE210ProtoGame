@@ -39,10 +39,10 @@ class Screen:
                 distance,
                 self.position,
                 [int((i if j > 0 else i - 0.001 if i - 0.001 >= 0 else 0)) for i,j in zip(self.position, self.direction)],
-                ('N' if (DataOps.fpart(self.position[1]) < 0.000000001 or DataOps.fpart(self.position[1]) > 0.999999999) and self.direction[1] > 0 else
-                 'S' if (DataOps.fpart(self.position[1]) < 0.000000001 or DataOps.fpart(self.position[1]) > 0.999999999) and self.direction[1] <= 0 else
-                 'E' if (DataOps.fpart(self.position[0]) < 0.000000001 or DataOps.fpart(self.position[0]) > 0.999999999) and self.direction[0] > 0 else
-                 'W' if (DataOps.fpart(self.position[0]) < 0.000000001 or DataOps.fpart(self.position[0]) > 0.999999999) and self.direction[0] <= 0 else 'O'),
+                ('E' if (DataOps.fpart(self.position[1]) < 0.000000001 or DataOps.fpart(self.position[1]) > 0.999999999) and self.direction[1] > 0 else
+                 'W' if (DataOps.fpart(self.position[1]) < 0.000000001 or DataOps.fpart(self.position[1]) > 0.999999999) and self.direction[1] <= 0 else
+                 'S' if (DataOps.fpart(self.position[0]) < 0.000000001 or DataOps.fpart(self.position[0]) > 0.999999999) and self.direction[0] > 0 else
+                 'N' if (DataOps.fpart(self.position[0]) < 0.000000001 or DataOps.fpart(self.position[0]) > 0.999999999) and self.direction[0] <= 0 else 'O'),
                  self.directionOriginal]
 
         def Cast(self): #CAST RETURNS [0:Distance, 1:EuclidDistance, 2:endPosition, 3:endTile, 4:tileSide, 5:originalDirection]
