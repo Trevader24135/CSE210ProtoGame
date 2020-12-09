@@ -23,6 +23,8 @@ waterDrips = [
 swordSwing = pygame.mixer.Sound("assets\\Sounds\\swordSwing.ogg")
 swordHit = pygame.mixer.Sound("assets\\Sounds\\swordHitWet.ogg")
 
+#Music by Scott Buckley, licensed under CC
+mainTheme = "assets\\Music\\sb_riseofanemporer.ogg"
 horizons = "assets\\Music\\sb_horizons.ogg"
 tearsInRain = "assets\\Music\\sb_tearsinrain.ogg"
 
@@ -108,11 +110,17 @@ class Music:
     def __init__(self, song, volume = 1, play = False, loop=False):
         pygame.mixer.music.load(song)
         pygame.mixer.music.set_volume(volume)
+        self.song = song
+        self.volume = volume
+
         if play:
             self.play(-1 if loop else 0)
 
-    def setSong(self, song):
-        pygame.mixer.music.load(song)
+    def setSong(self, song=None):
+        if type(song) == None:
+            pygame.mixer.music.load(self.song)
+        else:
+            pygame.mixer.music.load(song)
     
     def play(self, loops = 0):
         pygame.mixer.music.play(loops)
@@ -122,4 +130,10 @@ class Music:
 
     def setVolume(self, volume):
         pygame.mixer.music.set_volume(volume)
+    
+    def fadeOut(self, deltaTime, length):
+        self.volume -= deltaTime / length
+        if self.volume < 0:
+            self.volume = 0
+        self.setVolume(self.volume)
 
