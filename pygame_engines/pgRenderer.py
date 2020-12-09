@@ -190,9 +190,18 @@ class pgRenderer:
                 self.render([polygon], [])
         self.drawSprites(sprites)
         
-    def drawHud(self):
+    def drawHud(self, playerInfo = None):
         self.screen.blit(self.hud, (0, self.height - self.hudHeight))
         self.hudConsoleMessages()
+        if playerInfo != None:
+            text = myfont.render("Current Hit Points: {health}".format(health = str(playerInfo.currentHealth)), False, 'white')
+            self.screen.blit(text, (320,self.height - self.hudHeight + 5))
+            text = myfont.render("Current Armor     : {defense}".format(defense = str(playerInfo.defense)), False, 'white')
+            self.screen.blit(text, (320,self.height - self.hudHeight + 17))
+            text = myfont.render("Current Speed     : {maxSpeed}".format(maxSpeed = str(playerInfo.maxSpeed)), False, 'white')
+            self.screen.blit(text, (320,self.height - self.hudHeight + 29))
+            text = myfont.render("Attack Damage     : {attackDamage} +/- 5".format(attackDamage = str(playerInfo.attackDamage)), False, 'white')
+            self.screen.blit(text, (320,self.height - self.hudHeight + 41))
 
     def update(self, rect = [0,0,0,0]):
         if rect == [0,0,0,0]:

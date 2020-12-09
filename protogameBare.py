@@ -204,7 +204,7 @@ class Game:
             self.screen.displayDeath()
             self.screen.addConsoleMessage("you've Died! press Esc to quit")
 
-        self.gui.drawHud()
+        self.gui.drawHud(playerInfo = self.player)
 
         self.screen.update()
 

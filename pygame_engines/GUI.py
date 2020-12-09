@@ -3,5 +3,5 @@ class Hud:
         self.Renderer = Renderer
         self.player = playerObject
     
-    def drawHud(self):
-        self.Renderer.drawHud()
+    def drawHud(self, playerInfo = None):
+        self.Renderer.drawHud(playerInfo)
