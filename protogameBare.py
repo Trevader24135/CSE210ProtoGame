@@ -41,18 +41,30 @@ class Game:
             entities.ArmoredGoblin(position = [2,2]),
             entities.FastGoblin(position = [2,2]), 
 
-            entities.Goblin(position = [2,8.4]),
+            entities.Goblin(position = [2,8.4]),    #Top Right Room
 
-            entities.Goblin(position = [7.5,9.5]), 
+            entities.Goblin(position = [7.5,9.5]), #Top Right end
             
-            entities.Goblin(position = [8.5,1.5]), 
-            entities.Goblin(position = [7.7,2.3]),
+            entities.Goblin(position = [8.5,1.5]),  #Mid Left quarter
+            entities.ArmoredGoblin(position = [7.7,2.3]),
             entities.Goblin(position = [9,3.1]),
 
-            entities.Goblin(position = [12,5.5]),
+            entities.Goblin(position = [12.5,5.5]), #exit room
 
-            entities.Goblin(position = [11.5,9.5]),
+            entities.Goblin(position = [11.5,9.5]), #Mid Right dead end
             entities.Goblin(position = [13,9]),
+
+            entities.Goblin(position = [12,2]), # Mid left passage
+            entities.Goblin(position = [14.5,1.6]),
+
+            entities.Goblin(position = [16,7]), # Big Bottom middle room
+            entities.Goblin(position = [19,7.2]),
+            entities.Goblin(position = [20,6.4]),
+
+            entities.Goblin(position = [20.5,3.2]), # Bottom left room
+            entities.Goblin(position = [21.2,2.5]),
+
+            entities.Goblin(position = [18,9.5]), #bottom right dead end passage
         ]
         for i in self.enemies:
             i.entityList = self.enemies
