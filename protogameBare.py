@@ -58,7 +58,7 @@ class Game:
 
         self.soundManager = SoundEngine.SoundManager()
         self.player.walking = False
-        
+        self.music = SoundEngine.Music(song=SoundEngine.mainTheme)
         
     def on_event(self, event):
         if event[0] == 'QUIT':
@@ -197,7 +197,20 @@ class Game:
             self.fpsTime = 0
 
     def on_execute(self):
-        
+        self.screen.TitleScreen()
+        self.music.play()
+        while(not 'return' in self.keysHeld and not 'space' in self.keysHeld):
+            self.keysPressed = []
+            for event in self.screen.events():
+                self.on_event(event)
+
+        self.screen.TitleScreenAniTime = time.perf_counter()
+        self.timer()
+        while self.screen.TitleScreenFadeOut(self.deltaTime):
+            self.timer()
+            self.music.fadeOut(self.deltaTime, 3)
+        self.music.pause()
+
         while( self._running ):
             self.timer()
             self.keysPressed = []

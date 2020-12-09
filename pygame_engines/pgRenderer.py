@@ -25,6 +25,7 @@ if config.texturedWalls:
         "255255255":pygame.image.load("assets\\Walls\\white.png"),
         "109109109":pygame.image.load("assets\\Walls\\Wall32T.png"),
         "110109109":pygame.image.load("assets\\Walls\\Wall32TRustedChains.png"),
+        "110110109":pygame.image.load("assets\\Walls\\Wall32TTorch.png"),
         "110110110":pygame.image.load("assets\\Walls\\Wall32TExit.png")
     }
 
@@ -42,6 +43,7 @@ class pgRenderer:
         self.viewportMid = (self.height - self.hudHeight) / 2
         self.FogofWar = FogofWar
         
+        self.titleScreenImage = pygame.image.load("assets\\HUD\\titleScreen.png").convert_alpha()
         self.hud = pygame.image.load("assets\\HUD\\hud.png")
         self.hud = pygame.transform.scale(self.hud, (self.width, self.hudHeight))
         self.winMsg = pygame.image.load("assets\\HUD\\winMsg.png")
@@ -237,3 +239,18 @@ class pgRenderer:
     
     def displayGameWin(self):
         self.screen.blit(self.winMsg, ((self.width - self.winMsg.get_width()) / 2, (self.height - self.winMsg.get_height()) / 2))
+    
+    def TitleScreen(self):
+        self.screen.blit(self.titleScreenImage, (0,0))
+        self.update()
+        self.TitleScreenAniTime = 0
+
+    def TitleScreenFadeOut(self, deltaTime):
+        color = [255,255,255]
+        if time.perf_counter() - self.TitleScreenAniTime < 3:
+            self.titleScreenImage.fill(color, special_flags=pygame.BLEND_RGB_MULT)
+            self.screen.blit(self.titleScreenImage, (0,0))
+            self.update()
+            return True
+        else:
+            return False
