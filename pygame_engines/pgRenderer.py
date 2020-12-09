@@ -230,7 +230,6 @@ class pgRenderer:
             self.weaponPos = [300,150]
             self.weaponAngle = -30
             self.weapon = pygame.transform.rotate(swordSprite, self.weaponAngle)
-            
         else:
             self.weaponPos = [self.weaponPos[0] + 1 * self.deltaTime, self.weaponPos[1] + 450 * self.deltaTime]
             self.weaponAngle += 360 * self.deltaTime
@@ -238,6 +237,8 @@ class pgRenderer:
         self.screen.blit(self.weapon, self.weaponPos)
     
     def startAttack(self):
+        self.weaponPos = [300,150]
+        self.weaponAngle = -30
         self.weaponAniTime = time.perf_counter()
     
     def displayGameWin(self):
