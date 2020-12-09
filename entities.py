@@ -162,7 +162,8 @@ class Character(Object):# vv                                      Object Info   
 
     def attack(self, target):
         self.attackTime = time.perf_counter()
-        target.damage(self.attackDamage)
+        damageDealt = target.damage(self.attackDamage)
+        return damageDealt
 
     def damage(self, damage):
         self.colorMultiplier = [255, 0.5, 0.5]
@@ -175,6 +176,8 @@ class Character(Object):# vv                                      Object Info   
 
         if(self.currentHealth <= 0):
             self.entityList.remove(self)
+        
+        return damage - self.defense
 
 ## Specific Entity Types ##
 
@@ -183,6 +186,8 @@ class Player(Character):
         super().__init__(position)
         self.direction = VectorOps.normalize(direction)
         self.walking = False
+        self.attacking = False
+        self.attackHit = False
 
 class Goblin(Character):
     def __init__(self, position = [3.5, 3.5], entityList = None):

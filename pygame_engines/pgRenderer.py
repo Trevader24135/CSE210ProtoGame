@@ -7,11 +7,9 @@ import mapTools
 
 pygame.init()
 
-
-if config.debugLevel >= 1:
-    import DataOps
-    pygame.font.init()
-    myfont = pygame.font.SysFont('Lucida Console', 10)
+import DataOps
+pygame.font.init()
+myfont = pygame.font.SysFont('Lucida Console', 10)
 
 if config.texturedWalls:
     import DataOps
@@ -48,6 +46,8 @@ class pgRenderer:
         self.background.fill((0,0,0))
         for i in range(0,80):
             pygame.draw.ellipse(self.background, [i,i,i], (-self.width/2, int((self.height - self.hudHeight)/2 + i * 2.5), 2 * self.width, self.height))
+        
+        self.consoleMessages = ["Welcome to the dungeon adventurer!","Find a way to escape!","W & S to move","A & D to look","Space bar to attack"]
     
     def debugSprites(self, corner):
         pygame.draw.circle(self.screen, 'blue', [corner[0] + (corner[2])/2,10], 5)
@@ -177,6 +177,7 @@ class pgRenderer:
         
     def drawHud(self):
         self.screen.blit(self.hud, (0, self.height - self.hudHeight))
+        self.hudConsoleMessages()
 
     def update(self, rect = [0,0,0,0]):
         if rect == [0,0,0,0]:
@@ -196,3 +197,13 @@ class pgRenderer:
             elif event.type == pygame.KEYUP:
                 keys.append([pygame.key.name(event.key), 'release'])
         return keys
+
+    def hudConsoleMessages(self):
+        for i,message in enumerate(self.consoleMessages):
+            text = myfont.render(message, False, 'white')
+            self.screen.blit(text, (10,self.height - self.hudHeight + 5 + i*12))
+    
+    def addConsoleMessage(self, message):
+        self.consoleMessages.append(message)
+        if len(self.consoleMessages) > 5:
+            self.consoleMessages.pop(0)

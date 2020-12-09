@@ -103,9 +103,18 @@ class Game:
         checkwin()
         self.spritesOnScreen = generateSpriteList()
 
-        if 'space' in self.keysPressed and len(self.spritesOnScreen) != 0:
-            if self.loopTime - self.player.attackCoolDown > self.player.attackTime:
-                self.player.attack(self.spritesOnScreen[0][0])
+        if 'space' in self.keysPressed:
+            if self.loopTime - self.player.attackCoolDown > self.player.attackTime and len(self.spritesOnScreen) != 0:
+                damage = self.player.attack(self.spritesOnScreen[0][0])
+                self.screen.addConsoleMessage("you dealt {damage} damage!".format(damage = damage))
+                self.player.attackHit = True
+            else:
+                self.player.attackHit = False
+                self.screen.addConsoleMessage("you missed!")
+            self.player.attacking = True
+        else:
+            self.player.attacking = False
+            self.player.attackHit = False
 
         for enemy in self.enemies: #enemy pathing
             if self.rayCaster.TestLoS(self.player.position, enemy.position):
@@ -149,10 +158,20 @@ class Game:
         self.screen.update()
 
     def manageSounds(self):
-        if self.player.walking != False:
-            self.soundManager.startSound(walking=True, walkDelay=(0.6 if self.player.walking == 'forward' else 1))
+        if self.player.walking:
+            self.soundManager.walkSound(walking=True, walkDelay=(0.6 if self.player.walking == 'forward' else 1))
         else:
-            self.soundManager.startSound(walking=False)
+            self.soundManager.walkSound(walking=False)
+
+        if self.player.attacking:
+            self.soundManager.swingSound(True)
+        else:
+            self.soundManager.swingSound(False)
+
+        if self.player.attackHit:
+            self.soundManager.attackHitSound(True)
+        else:
+            self.soundManager.attackHitSound(False)
 
         self.soundManager.playSounds()
 

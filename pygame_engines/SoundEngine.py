@@ -20,6 +20,8 @@ waterDrips = [
     pygame.mixer.Sound("assets\\Sounds\\waterDripCave01.ogg")
 ]
 
+swordSwing = pygame.mixer.Sound("assets\\Sounds\\swordSwing.ogg")
+swordHit = pygame.mixer.Sound("assets\\Sounds\\swordHitWet.ogg")
 
 horizons = "assets\\Music\\sb_horizons.ogg"
 tearsInRain = "assets\\Music\\sb_tearsinrain.ogg"
@@ -31,6 +33,8 @@ class SoundManager:
         self.walking = False
         self.walkTime = Time
         self.walkDelay = 0.75
+        self.attacking = False
+        self.hitting = False
 
         if ambience:
             Sounds(ambientSound, volume=0.075 * config.volume).play(-1)
@@ -43,18 +47,31 @@ class SoundManager:
         self.waterDripTime = Time
         self.waterDripDelay = random.randint(3500, 4000) / 1000
         
-    def startSound(self, walking = None, walkDelay = None):
+    def walkSound(self, walking = None, walkDelay = None):
         if walking != None:
             self.walking = walking
         if walkDelay != None:
             self.walkDelay = walkDelay
     
+    def swingSound(self, attacking):
+        self.attacking = attacking
+    
+    def attackHitSound(self, hitting):
+        self.hitting = hitting
+
     def playSounds(self):
         Time = time.perf_counter()
         if self.walking and Time - self.walkTime > self.walkDelay:
             Sounds(footstep[self.foot], volume=0.3 * config.volume).play()
             self.foot = 0 if self.foot == 1 else 1
             self.walkTime = Time
+
+        if self.attacking:
+            Sounds(swordSwing, volume=0.85 * config.volume).play()
+
+        if self.hitting:
+            Sounds(swordHit, volume=0.2 * config.volume).play()
+
         if self.randomSounds:
             self.__randomSounds(Time)
 
