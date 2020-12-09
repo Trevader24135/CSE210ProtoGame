@@ -22,6 +22,7 @@ waterDrips = [
 
 swordSwing = pygame.mixer.Sound("assets\\Sounds\\swordSwing.ogg")
 swordHit = pygame.mixer.Sound("assets\\Sounds\\swordHitWet.ogg")
+enemySwordHit = pygame.mixer.Sound("assets\\Sounds\\swordHitWet.ogg")
 
 #Music by Scott Buckley, licensed under CC
 mainTheme = "assets\\Music\\sb_riseofanemporer.ogg"
@@ -37,6 +38,7 @@ class SoundManager:
         self.walkDelay = 0.75
         self.attacking = False
         self.hitting = False
+        self.enemyHitting = False
 
         if ambience:
             Sounds(ambientSound, volume=0.075 * config.volume).play(-1)
@@ -61,6 +63,9 @@ class SoundManager:
     def attackHitSound(self, hitting):
         self.hitting = hitting
 
+    def enemyAttackHitSound(self, hitting):
+        self.enemyHitting = hitting
+
     def playSounds(self):
         Time = time.perf_counter()
         if self.walking and Time - self.walkTime > self.walkDelay:
@@ -73,6 +78,9 @@ class SoundManager:
 
         if self.hitting:
             Sounds(swordHit, volume=0.2 * config.volume).play()
+
+        if self.enemyHitting:
+            Sounds(enemySwordHit, volume=0.2 * config.volume).play()
 
         if self.randomSounds:
             self.__randomSounds(Time)

@@ -47,6 +47,7 @@ class pgRenderer:
         self.hud = pygame.image.load("assets\\HUD\\hud.png")
         self.hud = pygame.transform.scale(self.hud, (self.width, self.hudHeight))
         self.winMsg = pygame.image.load("assets\\HUD\\winMsg.png")
+        self.deathMsg = pygame.image.load("assets\\HUD\\deathMsg.png")
         self.deltaTime, self.lastTime = 0, time.perf_counter()
         self.weapon = swordSprite
         self.weaponAniTime = 0
@@ -240,14 +241,17 @@ class pgRenderer:
     def displayGameWin(self):
         self.screen.blit(self.winMsg, ((self.width - self.winMsg.get_width()) / 2, (self.height - self.winMsg.get_height()) / 2))
     
-    def TitleScreen(self):
+    def displayDeath(self):
+        self.screen.blit(self.deathMsg, ((self.width - self.winMsg.get_width()) / 2, (self.height - self.winMsg.get_height()) / 2))
+
+    def titleScreen(self):
         self.screen.blit(self.titleScreenImage, (0,0))
         self.update()
-        self.TitleScreenAniTime = 0
+        self.titleScreenAniTime = 0
 
-    def TitleScreenFadeOut(self, deltaTime):
+    def titleScreenFadeOut(self, deltaTime):
         color = [255,255,255]
-        if time.perf_counter() - self.TitleScreenAniTime < 3:
+        if time.perf_counter() - self.titleScreenAniTime < 3:
             self.titleScreenImage.fill(color, special_flags=pygame.BLEND_RGB_MULT)
             self.screen.blit(self.titleScreenImage, (0,0))
             self.update()
