@@ -4,6 +4,7 @@ import config
 
 import math
 import time
+import random
 
 import pgRenderer as Renderer
 import SoundEngine
@@ -36,8 +37,8 @@ class Game:
         self.spritesOnScreen = []
         self.mobAI = entities.MobAI(mapTools.map) #initialize the AI pather with the map data
         self.enemies = [
-            entities.Goblin(position = [2.8,1.4]),
-            entities.ArmoredGoblin(position = [2.8,1.4]), 
+            entities.Goblin(position = [2.8,1.4]),      #organized by rooms
+            entities.ArmoredGoblin(position = [2,2]), 
 
             entities.Goblin(position = [2,8.4]),
 

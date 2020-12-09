@@ -1,6 +1,7 @@
 import sys
 sys.path.append('pygame_engines')
 import time
+import random
 
 import pgRenderer as Renderer
 import VectorOps
@@ -164,7 +165,7 @@ class Character(Object):# vv                                      Object Info   
     def attack(self, target, distance):
         if(self.reach >= distance):
             self.attackTime = time.perf_counter()
-            damageDealt = target.damage(self.attackDamage)
+            damageDealt = target.damage(random.randint(self.attackDamage - 5, self.attackDamage + 5))
             return damageDealt
         return 0
 
