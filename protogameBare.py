@@ -114,9 +114,12 @@ class Game:
         if 'space' in self.keysPressed:
             self.screen.startAttack()
             if self.loopTime - self.player.attackCoolDown > self.player.attackTime and len(self.spritesOnScreen) != 0:
-                damage = self.player.attack(self.spritesOnScreen[0][0])
-                self.screen.addConsoleMessage("you dealt {damage} damage!".format(damage = damage))
-                self.player.attackHit = True
+                damage = self.player.attack(self.spritesOnScreen[0][0], self.spritesOnScreen[0][1])
+                if(damage == 0):
+                    self.screen.addConsoleMessage("The target is too far!")
+                else:
+                    self.screen.addConsoleMessage("you dealt {damage} damage!".format(damage = damage))
+                    self.player.attackHit = True
             else:
                 self.player.attackHit = False
                 self.screen.addConsoleMessage("you missed!")

@@ -160,10 +160,12 @@ class Character(Object):# vv                                      Object Info   
         self.attackCoolDown = 0.4 #attack cool down duration in seconds
         self.attackTime = 0 #time of last attack
 
-    def attack(self, target):
-        self.attackTime = time.perf_counter()
-        damageDealt = target.damage(self.attackDamage)
-        return damageDealt
+    def attack(self, target, distance):
+        if(self.reach >= distance):
+            self.attackTime = time.perf_counter()
+            damageDealt = target.damage(self.attackDamage)
+            return damageDealt
+        return 0
 
     def damage(self, damage):
         self.colorMultiplier = [255, 0.5, 0.5]
