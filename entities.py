@@ -172,8 +172,6 @@ class Character(Object):# vv                                      Object Info   
         if(self.defense < damage):
             self.currentHealth -= damage - self.defense
 
-        print(self.currentHealth)
-
         if(self.currentHealth <= 0):
             self.entityList.remove(self)
         

@@ -2,7 +2,7 @@ import config
 
 import math
 import pygame
-
+import time
 import mapTools
 
 pygame.init()
@@ -28,6 +28,8 @@ if config.texturedWalls:
     }
 
 goblinSprite = pygame.image.load("assets\\Mobs\\goblin.png")
+swordSprite = pygame.image.load("assets\\HUD\\swordFullDiag.png")
+swordSprite = pygame.transform.scale(swordSprite, (256, 256))
 
 class pgRenderer:
     def __init__(self, width, height, cameraDist = 0.1, hudHeight = 100, FogofWar=5):
@@ -41,6 +43,12 @@ class pgRenderer:
         
         self.hud = pygame.image.load("assets\\HUD\\hud.png")
         self.hud = pygame.transform.scale(self.hud, (self.width, self.hudHeight))
+
+        self.deltaTime, self.lastTime = 0, time.perf_counter()
+        self.weapon = swordSprite
+        self.weaponAniTime = 0
+        self.weaponPos = [300,150]
+        self.weaponAngle = 0
 
         self.background = pygame.Surface((self.width,self.height))
         self.background.fill((0,0,0))
@@ -207,3 +215,21 @@ class pgRenderer:
         self.consoleMessages.append(message)
         if len(self.consoleMessages) > 5:
             self.consoleMessages.pop(0)
+    
+    def drawWeapon(self):
+        self.deltaTime = time.perf_counter() - self.lastTime
+        self.lastTime = time.perf_counter()
+
+        if time.perf_counter() - self.weaponAniTime > 0.4:
+            weaponPos = self.weaponPos
+            self.weaponAngle = -30
+            self.weapon = pygame.transform.rotate(swordSprite, self.weaponAngle)
+            print(self.deltaTime)
+        else:
+            weaponPos = [self.weaponPos[0] + 2, self.weaponPos[1] + 2]
+            self.weaponAngle += 360 * self.deltaTime
+            self.weapon = pygame.transform.rotate(swordSprite, self.weaponAngle)
+        self.screen.blit(self.weapon, weaponPos)
+    
+    def startAttack(self):
+        self.weaponAniTime = time.perf_counter()

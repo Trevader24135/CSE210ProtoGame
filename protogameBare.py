@@ -23,12 +23,13 @@ cameraDist = 0.1 / math.tan(FOV / 2)
 
 class Game:
     def __init__(self):
+        self.loopTime, self.fpsTime, self.fps, self.deltaTime = 0, 0, 0, 0
         self.screen = Renderer.pgRenderer(width, height, cameraDist=cameraDist, FogofWar=config.FogofWar, hudHeight=hudHeight)
         
         self._running = True
         self.keysPressed, self.keysHeld = [], []
         self.rayCaster = RayCaster.Screen(mapTools.map, width = width, height = height - hudHeight, supersampling = config.supersampling, cameraDist = cameraDist, Renderer=self.screen)
-        self.loopTime, self.fpsTime, self.fps, self.deltaTime = 0, 0, 0, 0
+        
         self.player = entities.Player(position = [2.5,5.5], direction=(1,0))
 
         self.spritesOnScreen = []
@@ -104,6 +105,7 @@ class Game:
         self.spritesOnScreen = generateSpriteList()
 
         if 'space' in self.keysPressed:
+            self.screen.startAttack()
             if self.loopTime - self.player.attackCoolDown > self.player.attackTime and len(self.spritesOnScreen) != 0:
                 damage = self.player.attack(self.spritesOnScreen[0][0])
                 self.screen.addConsoleMessage("you dealt {damage} damage!".format(damage = damage))
@@ -148,6 +150,7 @@ class Game:
         else:
             self.screen.render(polygons, sprites)
 
+        self.screen.drawWeapon()
         self.gui.drawHud()
 
         if config.debugLevel >= 1:
