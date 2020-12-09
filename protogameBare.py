@@ -139,7 +139,19 @@ class Game:
                     enemy.move(VectorOps.multiply(VectorOps.normalize([(path[1][0] - enemy.position[0]), (path[1][1] - enemy.position[1])]),sConst), normalizeResult=False, smoothCollision = True)
                 except:
                     pass
-        
+
+        for enemy in self.enemies: #enemy attacking
+            if self.rayCaster.TestLoS(self.player.position, enemy.position):
+                if -1 < enemy.position[0] - self.player.position[0] < 1 and -1 < enemy.position[1] - self.player.position[1] < 1:
+                    if self.loopTime - enemy.attackCoolDown > enemy.attackTime:
+                        damage = enemy.attack(self.player,0)
+
+                        if(damage == -1):
+                            pass #End The Game
+                        else:
+                            #it might be better to have the sword or GUI flash red and have a health bar
+                            self.screen.addConsoleMessage("you recieved {damage} damage!".format(damage = damage))
+                            self.screen.addConsoleMessage("you are at {health} health!".format(health = self.player.currentHealth))
     def on_render(self):
         self.screen.drawBG()
 
