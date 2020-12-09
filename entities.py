@@ -201,3 +201,6 @@ class ArmoredGoblin(Character):
     def __init__(self, position = [3.5, 3.5], entityList = None):
         super().__init__(position = position, sprite = Renderer.armoredGoblinSprite, height = 1/2, entityList = entityList, speed = 0.15, attackDamage = 40, attackCoolDown = 1.5)
 
+class FastGoblin(Character):
+    def __init__(self, position = [3.5, 3.5], entityList = None):
+        super().__init__(position = position, sprite = Renderer.fastGoblinSprite, height = 1/2, entityList = entityList, speed = 0.52, attackDamage = 15, attackCoolDown = 0.5)

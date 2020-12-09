@@ -30,6 +30,7 @@ if config.texturedWalls:
     }
 
 armoredGoblinSprite = pygame.image.load("assets\\Mobs\\armoredGoblin.png")
+fastGoblinSprite = pygame.image.load("assets\\Mobs\\fastGoblin.png")
 goblinSprite = pygame.image.load("assets\\Mobs\\goblin.png")
 swordSprite = pygame.image.load("assets\\HUD\\swordFullDiag.png")
 swordSprite = pygame.transform.scale(swordSprite, (256, 256))
