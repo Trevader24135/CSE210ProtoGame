@@ -167,7 +167,7 @@ class pgRenderer:
         
         for polygon in reversed(polygons):
             sprites = self.drawSprites(sprites, polygon[0])
-            if polygon[0] < self.FogofWar:
+            if polygon[0] < self.FogofWar + 3:
                 
                 color = mapTools.map[polygon[2][0]][polygon[2][1]][mapTools.directions[polygon[3]]]
                 lightValue = mapTools.lightMap[polygon[2][0] + (1 if polygon[3] == 'N' else -1 if polygon[3] == 'S' else 0)][polygon[2][1] + (1 if polygon[3] == 'W' else -1 if polygon[3] == 'E' else 0)]
@@ -194,13 +194,13 @@ class pgRenderer:
         self.screen.blit(self.hud, (0, self.height - self.hudHeight))
         self.hudConsoleMessages()
         if playerInfo != None:
-            text = myfont.render("Current Hit Points: {health}".format(health = str(playerInfo.currentHealth)), False, 'white')
+            text = myfont.render("Hit Points   : {health}".format(health = str(playerInfo.currentHealth)), False, 'white')
             self.screen.blit(text, (320,self.height - self.hudHeight + 5))
-            text = myfont.render("Current Armor     : {defense}".format(defense = str(playerInfo.defense)), False, 'white')
+            text = myfont.render("Armor        : {defense}".format(defense = str(playerInfo.defense)), False, 'white')
             self.screen.blit(text, (320,self.height - self.hudHeight + 17))
-            text = myfont.render("Current Speed     : {maxSpeed}".format(maxSpeed = str(playerInfo.maxSpeed)), False, 'white')
+            text = myfont.render("Speed        : {maxSpeed}".format(maxSpeed = str(playerInfo.maxSpeed)), False, 'white')
             self.screen.blit(text, (320,self.height - self.hudHeight + 29))
-            text = myfont.render("Attack Damage     : {attackDamage} +/- 5".format(attackDamage = str(playerInfo.attackDamage)), False, 'white')
+            text = myfont.render("Attack Damage: {attackDamage} +/- 5".format(attackDamage = str(playerInfo.attackDamage)), False, 'white')
             self.screen.blit(text, (320,self.height - self.hudHeight + 41))
 
     def update(self, rect = [0,0,0,0]):
