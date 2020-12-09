@@ -187,7 +187,7 @@ class Character(Object):# vv                                      Object Info   
 
 class Player(Character):
     def __init__(self, position, direction=(-1,0)):
-        super().__init__(position, isPlayer=True)
+        super().__init__(position, isPlayer=True, reach = 0.75, attackCoolDown = 0.55)
         self.direction = VectorOps.normalize(direction)
         self.walking = False
         self.attacking = False
@@ -195,12 +195,12 @@ class Player(Character):
 
 class Goblin(Character):
     def __init__(self, position = [3.5, 3.5], entityList = None):
-        super().__init__(position = position, sprite = Renderer.goblinSprite, height = 1/2, entityList = entityList, speed = 0.3, attackDamage = 20, attackCoolDown = 1)
+        super().__init__(position = position, sprite = Renderer.goblinSprite, height = 1/2, entityList = entityList, speed = 0.3, attackDamage = 20, attackCoolDown = 1, reach = 0.55)
 
 class ArmoredGoblin(Character):
     def __init__(self, position = [3.5, 3.5], entityList = None):
-        super().__init__(position = position, sprite = Renderer.armoredGoblinSprite, height = 1/2, entityList = entityList, speed = 0.15, attackDamage = 30, attackCoolDown = 1.5, defense = 53)
+        super().__init__(position = position, sprite = Renderer.armoredGoblinSprite, height = 1/2, entityList = entityList, speed = 0.15, attackDamage = 30, attackCoolDown = 1.5, defense = 53, reach = 0.55)
 
 class FastGoblin(Character):
     def __init__(self, position = [3.5, 3.5], entityList = None):
-        super().__init__(position = position, sprite = Renderer.fastGoblinSprite, height = 1/2, entityList = entityList, speed = 0.52, attackDamage = 15, attackCoolDown = 0.75)
+        super().__init__(position = position, sprite = Renderer.fastGoblinSprite, height = 1/2, entityList = entityList, speed = 0.52, attackDamage = 15, attackCoolDown = 0.75, reach = 0.55)
