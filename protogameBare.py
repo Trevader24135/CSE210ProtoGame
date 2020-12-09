@@ -159,16 +159,15 @@ class Game:
         self.enemyAttacking = False
         for enemy in self.enemies: #enemy attacking
             if self.rayCaster.TestLoS(self.player.position, enemy.position):
-                if -0.6 < enemy.position[0] - self.player.position[0] < 0.6 and -0.6 < enemy.position[1] - self.player.position[1] < 0.6:
-                    if self.loopTime - enemy.attackCoolDown > enemy.attackTime:
-                        damage = enemy.attack(self.player,0)
+                if self.loopTime - enemy.attackCoolDown > enemy.attackTime:
+                    damage = enemy.attack(self.player,((enemy.position[0] - self.player.position[0])**(2)+(enemy.position[1] - self.player.position[1])**(2))**(1/2))
+                    if(damage == -1):
+                        self._running = False
+                    elif(damage > 0):
                         self.enemyAttacking = True
-                        if(damage == -1):
-                            self._running = False
-                        else:
-                            #it might be better to have the sword or GUI flash red and have a health bar
-                            self.screen.addConsoleMessage("you recieved {damage} damage!".format(damage = damage))
-                            self.screen.addConsoleMessage("you are at {health} health!".format(health = self.player.currentHealth))
+                        #it might be better to have the sword or GUI flash red and have a health bar
+                        self.screen.addConsoleMessage("you recieved {damage} damage!".format(damage = damage))
+                        self.screen.addConsoleMessage("you are at {health} health!".format(health = self.player.currentHealth))
 
     def on_render(self):
         self.screen.drawBG()
