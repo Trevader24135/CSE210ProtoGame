@@ -25,6 +25,7 @@ cameraDist = 0.1 / math.tan(FOV / 2)
 class Game:
     def __init__(self):
         self.loopTime, self.fpsTime, self.fps, self.deltaTime = 0, 0, 0, 0
+        self.timer()
         self.screen = Renderer.pgRenderer(width, height, cameraDist=cameraDist, FogofWar=config.FogofWar, hudHeight=hudHeight)
         
         self._running = True
@@ -206,8 +207,6 @@ class Game:
 
         self.gui.drawHud(playerInfo = self.player)
 
-        self.screen.update()
-
     def manageSounds(self):
         if self.player.walking:
             self.soundManager.walkSound(walking=True, walkDelay=(0.6 if self.player.walking == 'forward' else 1))
@@ -241,27 +240,49 @@ class Game:
             self.fpsTime = 0
 
     def on_execute(self):
-        self.screen.titleScreen()
-        self.music.play()
-        while(not 'return' in self.keysHeld and not 'space' in self.keysHeld):
+        def fadeIn(duration, image, coords = [0,0], hold = 0):
+            self.timer()
+            self.timer()
+            self.screen.fadeIn(0, duration=duration, hold=hold, image=image, coords=coords) #initialize fade variables
+            while self.screen.fadeIn(self.deltaTime): #perform fade
+                self.timer()
+        def fadeOut(duration, hold = 0, fadeMusic=False):
+            self.timer()
+            self.timer()
+            self.screen.fadeOut(0, duration=duration, hold=hold) #initialize fade variables
+            while self.screen.fadeOut(self.deltaTime): #perform fade
+                self.timer()
+                if fadeMusic:
+                    self.music.fadeOut(self.deltaTime, 3)
+
+        #MAIN GAME SEQUENCE
+        self.music.play() #start title music
+        fadeIn(4, self.screen.titleScreenImage) #fade into title screen
+        fadeIn(3, self.screen.titleScreenSubTitleImage, coords=(261,5))
+        fadeIn(2, self.screen.titleScreenTitleImage, coords=(164,36))
+        fadeIn(1, self.screen.titleScreenAuthorsImage, coords=(156,93), hold=1.5)
+        self.screen.titleScreenBegin()
+
+        while(not 'return' in self.keysHeld and not 'space' in self.keysHeld): #Wait for keypress on title screen
             self.keysPressed = []
             for event in self.screen.events():
                 self.on_event(event)
+        
+        fadeOut(3, hold = 1, fadeMusic = True)  #fade to black
+        self.music.pause() #stop music at the end of the fade
 
-        self.screen.titleScreenAniTime = time.perf_counter()
-        self.timer()
-        while self.screen.titleScreenFadeOut(self.deltaTime):
-            self.timer()
-            self.music.fadeOut(self.deltaTime, 3)
-        self.music.pause()
+        self.on_render() #Render first frame
+        fadeIn(1.5, self.screen.screen.convert_alpha()) #fade into game
 
-        while( self._running ):
+        self.screen.events() #clear event queue
+        while( self._running ): #Main Game Loop
             self.timer()
             self.keysPressed = []
             for event in self.screen.events():
                 self.on_event(event)
             self.loop()
             self.on_render()
+            self.screen.update() #update screen with rendered frame
             self.manageSounds()
         
         self._running = True

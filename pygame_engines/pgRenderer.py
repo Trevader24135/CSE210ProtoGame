@@ -45,7 +45,11 @@ class pgRenderer:
         self.viewportMid = (self.height - self.hudHeight) / 2
         self.FogofWar = FogofWar
         
-        self.titleScreenImage = pygame.image.load("assets\\HUD\\titleScreen.png").convert_alpha()
+        self.titleScreenImage = pygame.image.load("assets\\HUD\\titleScreen.png")
+        self.titleScreenSubTitleImage = pygame.image.load("assets\\HUD\\titleScreenSubTitle.png")
+        self.titleScreenTitleImage = pygame.image.load("assets\\HUD\\titleScreenTitle.png")
+        self.titleScreenAuthorsImage = pygame.image.load("assets\\HUD\\titleScreenAuthors.png")
+        self.titleScreenBeginImage = pygame.image.load("assets\\HUD\\titleScreenBegin.png")
         self.hud = pygame.image.load("assets\\HUD\\hud.png")
         self.hud = pygame.transform.scale(self.hud, (self.width, self.hudHeight))
         self.winMsg = pygame.image.load("assets\\HUD\\winMsg.png")
@@ -55,6 +59,8 @@ class pgRenderer:
         self.weaponAniTime = 0
         self.weaponPos = [300,150]
         self.weaponAngle = 0
+
+        self.fadeScreen, self.fadeTime, self.fadeDuration, self.fadeHold = None, 0, 0, 0
 
         self.background = pygame.Surface((self.width,self.height))
         self.background.fill((0,0,0))
@@ -256,17 +262,50 @@ class pgRenderer:
     def displayDeath(self):
         self.screen.blit(self.deathMsg, ((self.width - self.winMsg.get_width()) / 2, (self.height - self.winMsg.get_height()) / 2))
 
-    def titleScreen(self):
-        self.screen.blit(self.titleScreenImage, (0,0))
+    def titleScreenBegin(self):
+        self.screen.blit(self.titleScreenBeginImage, (192,431))
         self.update()
-        self.titleScreenAniTime = 0
 
-    def titleScreenFadeOut(self, deltaTime):
-        color = [255,255,255]
-        if time.perf_counter() - self.titleScreenAniTime < 3:
-            self.titleScreenImage.fill(color, special_flags=pygame.BLEND_RGB_MULT)
-            self.screen.blit(self.titleScreenImage, (0,0))
+    def fadeOut(self, deltaTime, duration=None, hold=0):
+        if duration != None:
+            self.fadeHold = hold
+            self.fadeScreen = self.screen.convert_alpha()
+            self.fadeDuration, self.fadeTime = duration, 0
+        
+        self.fadeTime += deltaTime
+        if not self.fadeTime > self.fadeDuration:
+            screen = pygame.Surface(self.size).convert_alpha()
+            screen.blit(self.fadeScreen, (0,0))
+            color = int((self.fadeTime/self.fadeDuration) * 255)
+            color = [255-color for i in [0,1,2]]
+            screen.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
+            self.screen.blit(screen, (0,0))
             self.update()
-            return True
-        else:
+        
+        if self.fadeTime >= self.fadeDuration + self.fadeHold:
             return False
+        return True
+    
+    def fadeIn(self, deltaTime, duration=None, hold=0, image=None, coords=[0,0]):
+        if duration != None:
+            self.fadeHold = hold
+            self.fadeImage = image
+            self.fadeCoords = coords
+            self.fadeScreen = self.screen.convert_alpha()
+            self.fadeDuration, self.fadeTime = duration, 0
+        
+        self.fadeTime += deltaTime
+        if not self.fadeTime > self.fadeDuration:
+            image = pygame.Surface(self.fadeImage.get_size()).convert_alpha()
+            image.blit(self.fadeImage, (0,0))
+            color = int((self.fadeTime/self.fadeDuration) * 255)
+            color = [color for i in [0,1,2]]
+            image.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
+            self.screen.blit(image, self.fadeCoords)
+            self.update()
+        
+        if self.fadeTime >= self.fadeDuration + self.fadeHold:
+            return False
+        return True
+
+        
