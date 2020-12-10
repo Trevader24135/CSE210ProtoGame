@@ -192,6 +192,11 @@ class Player(Character):
         self.walking = False
         self.attacking = False
         self.attackHit = False
+        self.inventory = {
+            "Rusty Sword  ":1,
+            "Health Potion":1
+            
+        }
 
 class Goblin(Character):
     def __init__(self, position = [3.5, 3.5], entityList = None):

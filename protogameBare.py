@@ -123,11 +123,24 @@ class Game:
                 print("you win!")
                 self.gameWon = True
                 self._running = False
+        def useHpPotion():
+            if self.player.inventory["Health Potion"] > 0:
+                if self.player.currentHealth < self.player.health:
+                    self.player.inventory["Health Potion"] -= 1
+                    self.player.currentHealth += 30
+                    if self.player.currentHealth > self.player.health:
+                        self.player.currentHealth = self.player.health
+                    self.screen.addConsoleMessage("used health potion! +30 health!")
+                else:
+                    self.screen.addConsoleMessage("you already have max health!")
+            else:
+                self.screen.addConsoleMessage("you have no more health potions!")
         
         playerMovement()
         checkwin()
         self.spritesOnScreen = generateSpriteList()
-
+        if 'h' in self.keysPressed:
+            useHpPotion()
         if 'space' in self.keysPressed:
             self.screen.startAttack()
             if self.loopTime - self.player.attackCoolDown > self.player.attackTime and len(self.spritesOnScreen) != 0:
@@ -254,7 +267,7 @@ class Game:
                 self.timer()
                 if fadeMusic:
                     self.music.fadeOut(self.deltaTime, 3)
-
+        
         #MAIN GAME SEQUENCE
         self.music.play() #start title music
         fadeIn(4, self.screen.titleScreenImage) #fade into title screen
@@ -273,7 +286,7 @@ class Game:
 
         self.on_render() #Render first frame
         fadeIn(1.5, self.screen.screen.convert_alpha()) #fade into game
-
+        
         self.screen.events() #clear event queue
         while( self._running ): #Main Game Loop
             self.timer()

@@ -67,7 +67,7 @@ class pgRenderer:
         for i in range(0,80):
             pygame.draw.ellipse(self.background, [i,i,i], (-self.width/2, int((self.height - self.hudHeight)/2 + i * 2.5), 2 * self.width, self.height))
         
-        self.consoleMessages = ["Welcome to the dungeon adventurer!","Find a way to escape!","W & S to move","A & D to look","Space bar to attack"]
+        self.consoleMessages = ["Welcome to the dungeon adventurer!","Find a way to escape!","W & S to move","A & D to look","Space bar to attack, H to use a health potion"]
     
     def debugSprites(self, corner):
         pygame.draw.circle(self.screen, 'blue', [corner[0] + (corner[2])/2,10], 5)
@@ -208,6 +208,10 @@ class pgRenderer:
             self.screen.blit(text, (320,self.height - self.hudHeight + 29))
             text = myfont.render("Attack Damage: {attackDamage} +/- 5".format(attackDamage = str(playerInfo.attackDamage)), False, 'white')
             self.screen.blit(text, (320,self.height - self.hudHeight + 41))
+            
+            for i, (key, value) in enumerate(playerInfo.inventory.items()):
+                text = myfont.render("{Name} : {Quantity}".format(Name=key, Quantity=value), False, 'white')
+                self.screen.blit(text, (500, self.height - self.hudHeight + 5 + 12 * i))
 
     def update(self, rect = [0,0,0,0]):
         if rect == [0,0,0,0]:
