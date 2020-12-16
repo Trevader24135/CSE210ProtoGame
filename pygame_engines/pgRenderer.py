@@ -15,6 +15,8 @@ if config.texturedWalls:
     import DataOps
     import VectorOps
     import ListOps
+    import sys
+    sys.path.append('')
     MissingTexture = pygame.image.load("assets\\Walls\\MissingTexture2.png")
 
     colorToTexture = {

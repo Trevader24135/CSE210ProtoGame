@@ -195,8 +195,8 @@ class Player(Character):
         self.inventory = {
             "Rusty Sword  ":1,
             "Health Potion":1
-            
         }
+        self.score = 0
 
 class Goblin(Character):
     def __init__(self, position = [3.5, 3.5], entityList = None):

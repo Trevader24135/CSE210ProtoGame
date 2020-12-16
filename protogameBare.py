@@ -24,7 +24,7 @@ cameraDist = 0.1 / math.tan(FOV / 2)
 
 class Game:
     def __init__(self):
-        self.loopTime, self.fpsTime, self.fps, self.deltaTime = 0, 0, 0, 0
+        self.loopTime, self.fpsTime, self.fps, self.deltaTime, self.playStartTime, self.playEndTime = 0, 0, 0, 0, 0, 0
         self.timer()
         self.screen = Renderer.pgRenderer(width, height, cameraDist=cameraDist, FogofWar=config.FogofWar, hudHeight=hudHeight)
         
@@ -50,7 +50,7 @@ class Game:
             entities.FastGoblin(position = [7.7,2.3]),
             entities.Goblin(position = [9,3.1]),
 
-            entities.Goblin(position = [12.5,5.5]), #exit room
+            entities.ArmoredGoblin(position = [12.5,5.5]), #exit room
 
             entities.Goblin(position = [11.5,9.5]), #Mid Right dead end
             entities.FastGoblin(position = [13,9]),
@@ -58,14 +58,14 @@ class Game:
             entities.Goblin(position = [12,2]), # Mid left passage
             entities.Goblin(position = [14.5,1.6]),
 
-            entities.Goblin(position = [16,7]), # Big Bottom middle room
+            entities.ArmoredGoblin(position = [16,7]), # Big Bottom middle room
             entities.FastGoblin(position = [19,7.2]),
             entities.Goblin(position = [20,6.4]),
 
             entities.ArmoredGoblin(position = [20.5,3.2]), # Bottom left room
             entities.FastGoblin(position = [21.2,2.5]),
 
-            entities.Goblin(position = [18,9.5]), #bottom right dead end passage
+            entities.ArmoredGoblin(position = [18,9.5]), #bottom right dead end passage
         ]
         for i in self.enemies:
             i.entityList = self.enemies
@@ -141,9 +141,10 @@ class Game:
         self.spritesOnScreen = generateSpriteList()
         if 'h' in self.keysPressed:
             useHpPotion()
-        if 'space' in self.keysPressed:
+        if 'space' in self.keysPressed and self.loopTime - self.player.attackTime > self.player.attackCoolDown:
+            self.player.attackTime = self.loopTime
             self.screen.startAttack()
-            if self.loopTime - self.player.attackCoolDown > self.player.attackTime and len(self.spritesOnScreen) != 0:
+            if len(self.spritesOnScreen) != 0:
                 damage = self.player.attack(self.spritesOnScreen[0][0], self.spritesOnScreen[0][1])
                 if(damage == 0):
                     self.screen.addConsoleMessage("The target is too far!")
@@ -287,6 +288,7 @@ class Game:
         self.on_render() #Render first frame
         fadeIn(1.5, self.screen.screen.convert_alpha()) #fade into game
         
+        self.playStartTime = time.perf_counter()
         self.screen.events() #clear event queue
         while( self._running ): #Main Game Loop
             self.timer()
@@ -297,7 +299,10 @@ class Game:
             self.on_render()
             self.screen.update() #update screen with rendered frame
             self.manageSounds()
-        
+        self.playEndTime = time.perf_counter()
+
+        self.player.score += ( 100 - (self.playEndTime - self.playStartTime) / 2 if (self.playEndTime - self.playStartTime) / 2 < 100 else 0) + self.player.currentHealth
+        print(self.player.score)
         self._running = True
         while( self._running ):
             for event in self.screen.events():
